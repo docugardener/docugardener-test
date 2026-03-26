@@ -1,22 +1,20 @@
 ```markdown
-### `init_payment`
+### `get_payment_status`
 
-Initiates a payment transaction.
+```python
+def get_payment_status(transaction_id: str) -> dict
+```
+
+Retrieve the current status of a payment transaction.
 
 **Parameters:**
 
--   `amount` (float): The amount to be paid.
--   `currency` (str, optional): The currency of the payment. Defaults to `"USD"`.
+*   `transaction_id` (str): The unique identifier for the payment transaction.
 
 **Returns:**
 
-dict: A dictionary containing the transaction ID, status, and currency.
+A dictionary containing the transaction ID, status, and settlement status. For example:
 
-**Example:**
-
-```python
-result = init_payment(amount=100.0, currency="EUR")
-print(result)
-# Expected output: {'transaction_id': 'txn_123', 'status': 'pending', 'currency': 'EUR'}
-```
+```json
+{"transaction_id": "your_transaction_id", "status": "completed", "settled": True}
 ```
