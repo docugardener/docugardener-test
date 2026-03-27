@@ -1062,3 +1062,30 @@ def validate_card_payment_23286e(method: str, card_last4: str, amount: float) ->
         "currency": "USD",
     }
 
+
+
+def apply_surcharge_a8afff(amount: float, surcharge_pct: float, currency: str = "USD") -> dict:
+    """Apply a percentage-based surcharge to a payment transaction.
+
+    Calculates the surcharge value, validates inputs, and returns a breakdown
+    including the original amount, surcharge, total charged, and applied currency.
+    Surcharge percentage must be between 0 and 50 (exclusive).
+
+    Args:
+        amount: Base transaction amount (must be > 0).
+        surcharge_pct: Surcharge rate as a percentage (e.g. 2.5 for 2.5%).
+        currency: ISO 4217 currency code.  Defaults to USD.
+    """
+    if amount <= 0:
+        raise ValueError("amount must be positive")
+    if not (0 < surcharge_pct < 50):
+        raise ValueError("surcharge_pct must be between 0 and 50")
+    surcharge = round(amount * surcharge_pct / 100, 2)
+    return {
+        "original": amount,
+        "surcharge": surcharge,
+        "total": round(amount + surcharge, 2),
+        "currency": currency,
+        "rate_applied": surcharge_pct,
+    }
+
