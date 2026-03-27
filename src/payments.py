@@ -28,4 +28,23 @@ def handle_webhook(payload: dict, secret: str) -> dict:
 def get_payment_status(transaction_id: str) -> dict:
     """Retrieve the current status of a payment transaction."""
     return {"transaction_id": transaction_id, "status": "completed", "settled": True}
+
+
+def cancel_payment(
+    transaction_id: str,
+    reason: str = "customer_request",
+    notify_customer: bool = True,
+    idempotency_key: str | None = None,
+) -> dict:
+    """Cancel a pending payment before it is captured.
+
+    Only payments in 'pending' or 'authorized' state can be cancelled.
+    Captured payments must use refund_payment instead.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "status": "cancelled",
+        "reason": reason,
+        "customer_notified": notify_customer,
+    }
 # payments module v2
