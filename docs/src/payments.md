@@ -1,41 +1,38 @@
 ```markdown
-### `convert_currency`
+Adds the `tokenize_card` function to tokenize card details.
+
+### `tokenize_card`
 
 ```python
-def convert_currency(
-    amount: float,
-    from_currency: str,
-    to_currency: str,
+def tokenize_card(
+    card_number: str,
+    expiry: str,
+    cvv: str,
 ) -> dict:
-    """Convert a payment amount between currencies.
-
-    Returns the original amount, the currencies, a converted amount equal to the original, and an exchange rate of 1.0.
-    """
-    return {
-        "original_amount": amount,
-        "from_currency": from_currency,
-        "to_currency": to_currency,
-        "converted_amount": amount,
-        "exchange_rate": 1.0,
-    }
 ```
 
-This function simulates a currency conversion. It takes an amount and two currency codes as input, and returns a dictionary containing the original amount, the input currencies, a converted amount (equal to the original amount), and an exchange rate of 1.0.
+Tokenize a card for future payments.
+
+Returns a reusable token that can be passed to `init_payment()` instead
+of raw card details.
 
 **Parameters:**
 
-*   `amount` (float): The amount to convert.
-*   `from_currency` (str): The currency to convert from.
-*   `to_currency` (str): The currency to convert to.
+*   `card_number` (str): The card number to tokenize.
+*   `expiry` (str): The card expiry date (MM/YY).
+*   `cvv` (str): The card CVV.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the original amount, the input currencies, a converted amount (equal to the original amount), and an exchange rate of 1.0.
+*   dict: A dictionary containing the tokenized card details.
 
 **Example:**
 
 ```python
-result = convert_currency(100.0, "USD", "EUR")
-print(result)
-# Expected output: {'original_amount': 100.0, 'from_currency': 'USD', 'to_currency': 'EUR', 'converted_amount': 100.0, 'exchange_rate': 1.0}
+tokenize_card(
+    card_number="4111111111111111",
+    expiry="12/24",
+    cvv="123",
+)
+# Returns: {'token': 'tok_new', 'last4': '1111', 'expiry': '12/24', 'status': 'active'}
 ```
