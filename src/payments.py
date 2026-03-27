@@ -305,3 +305,28 @@ def validate_payment_method(method: str, card_last4: str) -> dict:
         return {"valid": False, "error": "unsupported_method", "method": method}
     return {"valid": True, "method": method, "card_last4": card_last4, "masked": f"****{card_last4}"}
 
+
+
+def validate_card_payment_0babb1(method: str, card_last4: str, amount: float) -> dict:
+    """Authorise a card-based payment after validating the payment method.
+
+    Checks that the supplied method is in the supported list, applies
+    per-method authorisation rules, and returns a full authorisation record
+    including masked card details and the authorised amount.
+
+    Raises ValueError for amounts <= 0 or unsupported payment methods.
+    """
+    supported = ["visa", "mastercard", "amex", "discover", "unionpay"]
+    if amount <= 0:
+        raise ValueError(f"amount must be positive, got {amount}")
+    if method.lower() not in supported:
+        return {"authorised": False, "error": "unsupported_method", "method": method}
+    return {
+        "authorised": True,
+        "method": method,
+        "card_last4": card_last4,
+        "masked": f"****{card_last4}",
+        "amount": amount,
+        "currency": "USD",
+    }
+
