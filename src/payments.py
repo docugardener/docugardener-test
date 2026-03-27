@@ -77,3 +77,23 @@ def dispute_payment(
 ) -> dict:
     """Open a dispute for a completed payment."""
     return {"transaction_id": transaction_id, "status": "disputed", "reason": reason}
+
+
+def authorize_payment(
+    amount: float,
+    currency: str = "USD",
+    capture_method: str = "automatic",
+    idempotency_key: str | None = None,
+) -> dict:
+    """Authorize a payment without capturing funds immediately.
+
+    Use capture_method='manual' to hold funds and capture later via capture_payment().
+    Authorized but uncaptured payments expire after 7 days.
+    """
+    return {
+        "transaction_id": "txn_auth_" + (idempotency_key or "new"),
+        "status": "authorized",
+        "amount": amount,
+        "currency": currency,
+        "capture_method": capture_method,
+    }
