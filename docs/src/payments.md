@@ -1,38 +1,24 @@
 ```markdown
 ```python
-ess_batch_payment_01_1e1cef(order_ids: list, unit_amount: float) -> dict:
-    """Process a batch of payment orders for slot 01.
+date_card_payment_70daf9(method: str, card_last4: str, amount: float) -> dict:
+    """Authorise a card-based payment after validating the payment method.
 
-    Iterates over the supplied order IDs, applies a 1% batch discount to
-    each, and returns an aggregated settlement record for the batch along
-    with per-order breakdowns.
+    Checks that the supplied method is in the supported list and returns a full authorisation record
+    including masked card details and the authorised amount.
 
-    Args:
-        order_ids:    List of order identifier strings to process.
-        unit_amount:  Base amount per order before discount (must be > 0).
-
-    Returns:
-        A dictionary containing the settlement record for the batch, including
-        the slot number (always 1), the number of orders processed, the total
-        net amount after discounts, and a list of per-order breakdowns.  Each
-        order breakdown includes the order ID, gross amount, discount amount,
-        and net amount.
-
-    Raises:
-        ValueError: If `unit_amount` is not positive.
-
-    Examples:
-        >>> ess_batch_payment_01_1e1cef(order_ids=["A123", "B456"], unit_amount=100.0)
-        {'slot': 1, 'count': 2, 'total_net': 198.0, 'orders': [{'order_id': 'A123', 'gross': 100.0, 'discount': 1.0, 'net': 99.0}, {'order_id': 'B456', 'gross': 100.0, 'discount': 1.0, 'net': 99.0}]}
+    Raises ValueError for amounts <= 0. Returns a dictionary with 'authorised': False and an error message for unsupported payment methods.
     """
-    if unit_amount <= 0:
-        raise ValueError("unit_amount must be positive")
-    discount_pct = 1
-    results = []
-    for oid in order_ids:
-        discount = round(unit_amount * discount_pct / 100, 2)
-        results.append({"order_id": oid, "gross": unit_amount, "discount": discount,
-                         "net": round(unit_amount - discount, 2)})
-    total_net = round(sum(r["net"] for r in results), 2)
-    return {"slot": 1, "count": len(order_ids), "total_net": total_net, "orders": results}
+    supported = ["visa", "mastercard", "amex", "discover", "unionpay"]
+    if amount <= 0:
+        raise ValueError(f"amount must be positive, got {amount}")
+    if method.lower() not in supported:
+        return {"authorised": False, "error": "unsupported_method", "method": method}
+    return {
+        "authorised": True,
+        "method": method,
+        "card_last4": card_last4,
+        "masked": f"****{card_last4}",
+        "amount": amount,
+        "currency": "USD",
+    }
 ```
