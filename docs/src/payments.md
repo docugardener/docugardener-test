@@ -1,32 +1,37 @@
 ```markdown
-### `cancel_payment`
+### `retry_payment`
 
 ```python
-def cancel_payment(transaction_id: str, reason: str = "customer_request", notify_customer: bool = True, idempotency_key: str | None = None) -> dict
+def retry_payment(
+    transaction_id: str,
+    max_attempts: int = 3,
+    backoff_seconds: float = 2.0,
+    use_new_idempotency_key: bool = True,
+) -> dict:
 ```
 
-Cancels a pending payment before it is captured.
+Retry a failed payment with exponential backoff.
 
-Only payments in `'pending'` or `'authorized'` state can be cancelled. Captured payments must use `refund_payment` instead.
+Only payments in 'failed' or 'declined' state can be retried.
+Each retry uses a fresh idempotency key by default to avoid
+duplicate-charge errors on the payment provider side.
 
 **Parameters:**
 
--   `transaction_id` (str): The ID of the transaction to cancel.
--   `reason` (str, optional): The reason for the cancellation. Defaults to `"customer_request"`.
--   `notify_customer` (bool, optional): Whether to notify the customer about the cancellation. Defaults to `True`.
--   `idempotency_key` (str | None, optional):  An idempotency key to prevent accidental duplicate cancellations. Defaults to `None`.
+*   `transaction_id` (str): The ID of the failed transaction to retry.
+*   `max_attempts` (int): The maximum number of retry attempts. Defaults to 3.
+*   `backoff_seconds` (float): The base backoff time in seconds. Defaults to 2.0.
+*   `use_new_idempotency_key` (bool): Whether to use a new idempotency key for each retry. Defaults to True.
 
 **Returns:**
 
-`dict`: A dictionary containing the cancellation details, including the transaction ID, status (`"cancelled"`), reason, and customer notification status.
+*   `dict`: A dictionary containing the transaction ID, status, maximum attempts, and backoff seconds.  The status will be "retrying".
 
 **Example:**
 
 ```python
-result = cancel_payment(
-    transaction_id="transaction123", reason="incorrect_amount", notify_customer=False
-)
+result = retry_payment(transaction_id="txn_123", max_attempts=5, backoff_seconds=3.0)
 print(result)
-# Expected output: {'transaction_id': 'transaction123', 'status': 'cancelled', 'reason': 'incorrect_amount', 'customer_notified': False}
+# Expected output: {'transaction_id': 'txn_123', 'status': 'retrying', 'max_attempts': 5, 'backoff_seconds': 3.0}
 ```
 ```
