@@ -1,48 +1,29 @@
 ```markdown
-### `validate_card_payment_a9eaaa`
+### `apply_surcharge_d9847d`
 
 ```python
-validate_card_payment_a9eaaa(method: str, card_last4: str, amount: float) -> dict:
+apply_surcharge_d9847d(amount: float, surcharge_pct: float, currency: str = "USD") -> dict
 ```
 
-Authorise a card-based payment after validating the payment method.
+Applies a percentage-based surcharge to a payment transaction.
 
-Checks that the supplied method is in the supported list and returns a full authorisation record
-including masked card details and the authorised amount.
-
-Raises `ValueError` for amounts less than or equal to 0. Returns a dictionary with `authorised: False` and an error message if the payment method is not supported.
+Calculates the surcharge value, validates inputs, and returns a breakdown including the original amount, surcharge, total charged, applied currency, and the surcharge rate applied. Surcharge percentage must be between 0 and 50 (exclusive).
 
 **Parameters:**
 
-*   `method` (str): The payment method (e.g., "visa", "mastercard").
-*   `card_last4` (str): The last four digits of the card number.
-*   `amount` (float): The payment amount.
+*   `amount` (float): Base transaction amount (must be > 0).
+*   `surcharge_pct` (float): Surcharge rate as a percentage (e.g. 2.5 for 2.5%).
+*   `currency` (str, optional): ISO 4217 currency code. Defaults to USD.
 
 **Returns:**
 
-A dictionary containing the authorisation details. If the payment is authorised, the dictionary will contain `authorised: True`, the payment `method`, the `card_last4`, a masked card number, the `amount`, and the `currency`. If the payment is not authorised (due to an unsupported method), the dictionary will contain `authorised: False`, an `error` message, and the attempted `method`.
+A dictionary containing the original amount, surcharge amount, total amount (including surcharge), currency, and the surcharge rate applied.
 
-**Raises:**
-
-*   `ValueError`: if `amount` is less than or equal to 0.
-
-**Examples:**
+**Example:**
 
 ```python
-# Successful authorisation
-result = validate_card_payment_a9eaaa(method="visa", card_last4="1234", amount=100.0)
+result = apply_surcharge_d9847d(amount=100.0, surcharge_pct=2.5, currency="EUR")
 print(result)
-# Expected output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
-
-# Unsuccessful authorisation due to unsupported method
-result = validate_card_payment_a9eaaa(method="unsupported", card_last4="1234", amount=100.0)
-print(result)
-# Expected output: {'authorised': False, 'error': 'unsupported_method', 'method': 'unsupported'}
-
-# Unsuccessful authorisation due to non-positive amount
-try:
-    result = validate_card_payment_a9eaaa(method="visa", card_last4="1234", amount=-100.0)
-except ValueError as e:
-    print(e)
-# Expected output: amount must be positive, got -100.0
+# Expected output: {'original': 100.0, 'surcharge': 2.5, 'total': 102.5, 'currency': 'EUR', 'rate_applied': 2.5}
+```
 ```
