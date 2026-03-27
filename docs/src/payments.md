@@ -1,33 +1,29 @@
 ```markdown
-### `estimate_fees`
+### `send_receipt`
 
 ```python
-def estimate_fees(
-    amount: float,
-    currency: str = "USD",
-    payment_method: str = "card",
-) -> dict:
+def send_receipt(transaction_id: str, email: str, format: str = "html") -> dict
 ```
 
-Estimate processing fees for a given payment amount and method.
+Send a payment receipt to a customer email address.
 
-Returns a breakdown of platform fee, network fee, and total charge.
-Supported `payment_method` values: `card`, `bank_transfer`, `wallet`.
+Supported formats: `'html'` (default), `'pdf'`, `'plain'`.
+Returns delivery status and message ID.
 
 **Parameters:**
 
-*   `amount` (float): The payment amount.
-*   `currency` (str, optional): The currency code (e.g., "USD"). Defaults to "USD".
-*   `payment_method` (str, optional): The payment method. Defaults to "card".
+-   `transaction_id` (*str*): The ID of the transaction.
+-   `email` (*str*): The customer's email address.
+-   `format` (*str*, optional): The format of the receipt. Defaults to `"html"`.
 
 **Returns:**
 
-*   dict: A dictionary containing the amount, currency, payment method, platform fee, network fee, and total fee.
+*dict*: A dictionary containing the transaction ID, email, format, status, and message ID.
 
 **Example:**
 
 ```python
->>> estimate_fees(amount=100.00, currency="USD", payment_method="card")
-{'amount': 100.0, 'currency': 'USD', 'payment_method': 'card', 'platform_fee': 1.4, 'network_fee': 0.6, 'total_fee': 2.0}
-```
+result = send_receipt(transaction_id="tx_123", email="customer@example.com", format="pdf")
+print(result)
+# Expected output: {'transaction_id': 'tx_123', 'email': 'customer@example.com', 'format': 'pdf', 'status': 'sent', 'message_id': 'msg_new'}
 ```
