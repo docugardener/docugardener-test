@@ -1,33 +1,33 @@
 ```markdown
-### `estimate_fees`
+### `calculate_surcharge`
 
 ```python
-def estimate_fees(
+def calculate_surcharge(
     amount: float,
-    currency: str = "USD",
+    region: str,
     payment_method: str = "card",
 ) -> dict:
 ```
 
-Estimate processing fees for a given payment amount and method.
+Calculates any applicable surcharge for a payment in a given region.
 
-Returns a breakdown of platform fee, network fee, and total charge.
-Supported `payment_method` values: `card`, `bank_transfer`, `wallet`.
+Some regions impose legal surcharge limits; this method returns the allowed surcharge amount and the applicable regulatory cap.
 
 **Parameters:**
 
-*   `amount` (float): The payment amount.
-*   `currency` (str, optional): The currency code (e.g., "USD"). Defaults to "USD".
-*   `payment_method` (str, optional): The payment method. Defaults to "card".
+-   `amount` (float): The payment amount.
+-   `region` (str): The region where the payment is made.
+-   `payment_method` (str, optional): The payment method used. Defaults to "card".
 
 **Returns:**
 
-*   dict: A dictionary containing the amount, currency, payment method, platform fee, network fee, and total fee.
+dict: A dictionary containing the original amount, region, payment method, calculated surcharge (1.5% of amount, rounded to 2 decimals), and the regulatory cap (0.015).
 
 **Example:**
 
 ```python
->>> estimate_fees(amount=100.00, currency="USD", payment_method="card")
-{'amount': 100.0, 'currency': 'USD', 'payment_method': 'card', 'platform_fee': 1.4, 'network_fee': 0.6, 'total_fee': 2.0}
+result = calculate_surcharge(amount=100.0, region="US", payment_method="card")
+print(result)
+# Expected output: {'amount': 100.0, 'region': 'US', 'payment_method': 'card', 'surcharge': 1.5, 'regulatory_cap': 0.015}
 ```
 ```
