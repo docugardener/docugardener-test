@@ -1,75 +1,43 @@
 ```markdown
-### `retry_payment`
+### authorize_payment
 
 ```python
-def retry_payment(
-    transaction_id: str,
-    max_attempts: int = 3,
-    backoff_seconds: float = 2.0,
-    use_new_idempotency_key: bool = True,
-) -> dict:
+def authorize_payment(amount: float, currency: str = "USD", capture_method: str = "automatic", idempotency_key: str | None = None) -> dict
 ```
 
-Retry a failed payment with exponential backoff.
+Authorize a payment without capturing funds immediately.
 
-Only payments in 'failed' or 'declined' state can be retried.
-Each retry uses a fresh idempotency key by default to avoid
-duplicate-charge errors on the payment provider side.
+Use `capture_method='manual'` to hold funds and capture later via `capture_payment()`.
+Authorized but uncaptured payments expire after 7 days.
 
 **Parameters:**
 
-*   `transaction_id` (str): The ID of the failed transaction to retry.
-*   `max_attempts` (int): The maximum number of retry attempts. Defaults to 3.
-*   `backoff_seconds` (float): The base backoff time in seconds. Defaults to 2.0.
-*   `use_new_idempotency_key` (bool): Whether to use a new idempotency key for each retry. Defaults to True.
+*   `amount` (float): The amount to authorize.
+*   `currency` (str, optional): The currency for the payment (e.g., "USD", "EUR"). Defaults to "USD".
+*   `capture_method` (str, optional):  `"automatic"` to immediately capture funds, or `"manual"` to authorize only. Defaults to `"automatic"`.
+*   `idempotency_key` (str | None, optional):  A unique key to prevent duplicate authorizations. If provided, repeated calls with the same key will return the same authorization. Defaults to `None`.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the transaction ID, status, maximum attempts, and backoff seconds.  The status will be "retrying".
+A dictionary containing the authorization details:
+
+*   `transaction_id` (str):  A unique transaction identifier (starts with "txn\_auth\_").
+*   `status` (str): The status of the authorization, which will be `"authorized"`.
+*   `amount` (float): The authorized amount.
+*   `currency` (str): The currency of the authorization.
+*   `capture_method` (str): The capture method used.
 
 **Example:**
 
 ```python
-result = retry_payment(transaction_id="txn_123", max_attempts=5, backoff_seconds=3.0)
-print(result)
-# Expected output: {'transaction_id': 'txn_123', 'status': 'retrying', 'max_attempts': 5, 'backoff_seconds': 3.0}
+authorization = authorize_payment(amount=100.00, currency="USD", capture_method="manual")
+print(authorization)
+# Expected output (actual transaction_id will vary):
+# {'transaction_id': 'txn_auth_new', 'status': 'authorized', 'amount': 100.0, 'currency': 'USD', 'capture_method': 'manual'}
 ```
-
-### `dispute_payment`
-
-Adds the `dispute_payment` function to allow users to open disputes for completed payments.
-
 ```python
-def dispute_payment(transaction_id: str, reason: str, evidence_url: str | None = None) -> dict
-```
-
-Opens a dispute for a completed payment.
-
-**Parameters:**
-
-*   `transaction_id` (str): The ID of the transaction to dispute.
-*   `reason` (str): The reason for the dispute.
-*   `evidence_url` (str, optional): A URL providing evidence for the dispute. Defaults to `None`.
-
-**Returns:**
-
-A dictionary containing the transaction ID and the dispute status.
-
-```python
-{
-    "transaction_id": transaction_id,
-    "status": "disputed",
-    "reason": reason
-}
-```
-
-**Example:**
-
-```python
-result = dispute_payment(
-    transaction_id="tx123", reason="Fraudulent transaction", evidence_url="http://example.com/evidence"
-)
-print(result)
-# Expected output: {'transaction_id': 'tx123', 'status': 'disputed', 'reason': 'Fraudulent transaction'}
-```
+authorization = authorize_payment(amount=50.00, currency="EUR", idempotency_key="unique_key_123")
+print(authorization)
+# Expected output (actual transaction_id will vary):
+# {'transaction_id': 'txn_auth_unique_key_123', 'status': 'authorized', 'amount': 50.0, 'currency': 'EUR', 'capture_method': 'automatic'}
 ```
