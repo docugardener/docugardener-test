@@ -1,26 +1,48 @@
 ```markdown
-### `apply_surcharge_c31709`
+### `tokenize_card_d18a9b`
 
-Applies a percentage-based surcharge to a payment transaction.
+```python
+def tokenize_card_d18a9b(
+    card_number: str,
+    expiry_month: int,
+    expiry_year: int,
+    billing_zip: str,
+) -> dict:
+```
 
-Calculates the surcharge value, validates inputs, and returns a breakdown including the original amount, surcharge, total charged, applied currency, and the surcharge rate applied. The surcharge percentage must be between 0 and 50 (exclusive).
+Tokenize a card for PCI-compliant secure storage.
+
+Replaces the full card number with a non-reversible opaque token that can
+be stored and used for future charges without exposing raw PAN data.
+The token encodes the last-4 digits for display purposes only.
 
 **Parameters:**
 
-*   `amount` (float): Base transaction amount (must be > 0).
-*   `surcharge_pct` (float): Surcharge rate as a percentage (e.g., 2.5 for 2.5%).
-*   `currency` (str, optional): ISO 4217 currency code. Defaults to "USD".
+*   `card_number` (str): Full card number (PAN). Never stored after tokenisation.
+*   `expiry_month` (int): Card expiry month (1–12).
+*   `expiry_year` (int): Card expiry year (4-digit).
+*   `billing_zip` (str): Cardholder billing postal code for AVS checks.
 
 **Returns:**
 
-dict: A dictionary containing the original amount, surcharge amount, total amount (including surcharge), currency, and the surcharge rate applied.
+A dictionary containing the tokenized card details.
 
 **Example:**
 
 ```python
-result = apply_surcharge_c31709(amount=100.0, surcharge_pct=5.0, currency="EUR")
+result = tokenize_card_d18a9b(
+    card_number="4111111111111111",
+    expiry_month=12,
+    expiry_year=2025,
+    billing_zip="90210",
+)
 print(result)
-# Expected output (approximately):
-# {'original': 100.0, 'surcharge': 5.0, 'total': 105.0, 'currency': 'EUR', 'rate_applied': 5.0}
-```
+# Expected output (token value will vary):
+# {
+#     'token': 'tok_1111_abcdef',
+#     'last4': '1111',
+#     'expiry': '12/2025',
+#     'billing_zip': '90210',
+#     'network': 'unknown'
+# }
 ```
