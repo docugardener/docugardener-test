@@ -1,13 +1,14 @@
 ```markdown
 ```python
-def validate_card_payment_ef9d9f(method: str, card_last4: str, amount: float) -> dict:
+def validate_card_payment_de563f(method: str, card_last4: str, amount: float) -> dict:
     """Authorise a card-based payment after validating the payment method.
 
-    Checks that the supplied method is in the supported list and returns an
-    authorisation record including masked card details and the authorised amount.
+    Checks that the supplied method is in the supported list and returns a
+    full authorisation record including masked card details and the authorised
+    amount.
 
     Raises ValueError for amounts <= 0. Returns a dictionary with
-    `authorised: False` for unsupported payment methods.
+    `authorised: False` and an `error` message for unsupported payment methods.
 
     Parameters:
         method (str): The payment method (e.g., "visa", "mastercard").
@@ -15,26 +16,25 @@ def validate_card_payment_ef9d9f(method: str, card_last4: str, amount: float) ->
         amount (float): The payment amount.
 
     Returns:
-        dict: A dictionary containing the authorisation details.  If authorised,
-              it includes 'authorised': True, the payment method, masked card
-              details, amount, and currency. If not authorised due to an
-              unsupported method, it includes 'authorised': False and an error
-              message.
+        dict: A dictionary containing the authorisation details.  If
+        authorised, includes 'authorised': True, the payment method, masked
+        card details, amount, and currency. If not authorised due to an
+        unsupported method, includes 'authorised': False and an 'error' message.
 
     Raises:
-        ValueError: If the amount is not positive (<= 0).
+        ValueError: If the amount is not positive.
 
     Example:
-        >>> validate_card_payment_ef9d9f("visa", "1234", 100.0)
+        >>> validate_card_payment_de563f("visa", "1234", 100.0)
         {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
 
-        >>> validate_card_payment_ef9d9f("invalid", "5678", 50.0)
+        >>> validate_card_payment_de563f("invalid", "1234", 100.0)
         {'authorised': False, 'error': 'unsupported_method', 'method': 'invalid'}
 
-        >>> validate_card_payment_ef9d9f("visa", "9012", -10.0)
+        >>> validate_card_payment_de563f("visa", "1234", -100.0)
         Traceback (most recent call last):
           ...
-        ValueError: amount must be positive, got -10.0
+        ValueError: amount must be positive, got -100.0
     """
     supported = ["visa", "mastercard", "amex", "discover", "unionpay"]
     if amount <= 0:
