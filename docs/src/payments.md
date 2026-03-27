@@ -1,32 +1,39 @@
 ```markdown
-### `cancel_payment`
+Adds the `dispute_payment` function to allow users to open disputes for completed payments.
+
+### dispute_payment
 
 ```python
-def cancel_payment(transaction_id: str, reason: str = "customer_request", notify_customer: bool = True, idempotency_key: str | None = None) -> dict
+def dispute_payment(transaction_id: str, reason: str, evidence_url: str | None = None) -> dict
 ```
 
-Cancels a pending payment before it is captured.
-
-Only payments in `'pending'` or `'authorized'` state can be cancelled. Captured payments must use `refund_payment` instead.
+Opens a dispute for a completed payment.
 
 **Parameters:**
 
--   `transaction_id` (str): The ID of the transaction to cancel.
--   `reason` (str, optional): The reason for the cancellation. Defaults to `"customer_request"`.
--   `notify_customer` (bool, optional): Whether to notify the customer about the cancellation. Defaults to `True`.
--   `idempotency_key` (str | None, optional):  An idempotency key to prevent accidental duplicate cancellations. Defaults to `None`.
+*   `transaction_id` (str): The ID of the transaction to dispute.
+*   `reason` (str): The reason for the dispute.
+*   `evidence_url` (str, optional): A URL providing evidence for the dispute. Defaults to `None`.
 
 **Returns:**
 
-`dict`: A dictionary containing the cancellation details, including the transaction ID, status (`"cancelled"`), reason, and customer notification status.
+A dictionary containing the transaction ID and the dispute status.
+
+```python
+{
+    "transaction_id": transaction_id,
+    "status": "disputed",
+    "reason": reason
+}
+```
 
 **Example:**
 
 ```python
-result = cancel_payment(
-    transaction_id="transaction123", reason="incorrect_amount", notify_customer=False
+result = dispute_payment(
+    transaction_id="tx123", reason="Fraudulent transaction", evidence_url="http://example.com/evidence"
 )
 print(result)
-# Expected output: {'transaction_id': 'transaction123', 'status': 'cancelled', 'reason': 'incorrect_amount', 'customer_notified': False}
+# Expected output: {'transaction_id': 'tx123', 'status': 'disputed', 'reason': 'Fraudulent transaction'}
 ```
 ```
