@@ -1,54 +1,38 @@
 ```markdown
-### `schedule_payment`
+### `split_payment`
 
-```python
-def schedule_payment(amount: float, currency: str = "USD", scheduled_at: str | None = None) -> dict
-```
+Splits a payment across multiple recipients.
 
-Schedule a payment for future execution.
-
-`scheduled_at` should be an ISO 8601 datetime string.
-If omitted, the payment is scheduled for the next business day.
+Each recipient dict should contain `account_id` and `amount`. The sum of recipient amounts must equal the total amount.
 
 **Parameters:**
 
--   `amount` (float): The payment amount.
--   `currency` (str, optional): The currency code (e.g., "USD"). Defaults to "USD".
--   `scheduled_at` (str | None, optional): An ISO 8601 datetime string specifying when to schedule the payment. If `None`, the payment is scheduled for the next business day. Defaults to `None`.
+*   `amount` (float): The total amount to split.
+*   `recipients` (list[dict]): A list of dictionaries, where each dictionary represents a recipient and contains their `account_id` and `amount`.
+*   `currency` (str, optional): The currency for the payment. Defaults to "USD".
 
 **Returns:**
 
-A dictionary containing the transaction details, including:
-
--   `transaction_id` (str): A dummy transaction ID ("txn_sched_new").
--   `status` (str): The status of the scheduled payment ("scheduled").
--   `amount` (float): The payment amount.
--   `currency` (str): The currency code.
--   `scheduled_at` (str | None): The scheduled datetime string, or `None` if not specified.
+*   `dict`: A dictionary containing the transaction details, including a `transaction_id`, `status`, `total_amount`, `currency`, and the list of `recipients`.
 
 **Example:**
 
 ```python
-result = schedule_payment(amount=100.00, currency="EUR", scheduled_at="2024-03-15T10:00:00Z")
+recipients = [
+    {"account_id": "acc_123", "amount": 20.0},
+    {"account_id": "acc_456", "amount": 30.0},
+]
+result = split_payment(amount=50.0, recipients=recipients, currency="EUR")
 print(result)
 # Expected output:
 # {
-#     'transaction_id': 'txn_sched_new',
-#     'status': 'scheduled',
-#     'amount': 100.0,
-#     'currency': 'EUR',
-#     'scheduled_at': '2024-03-15T10:00:00Z'
-# }
-```
-```python
-result = schedule_payment(amount=50.00)
-print(result)
-# Expected output:
-# {
-#     'transaction_id': 'txn_sched_new',
-#     'status': 'scheduled',
-#     'amount': 50.0,
-#     'currency': 'USD',
-#     'scheduled_at': None
+#     "transaction_id": "txn_split_new",
+#     "status": "pending",
+#     "total_amount": 50.0,
+#     "currency": "EUR",
+#     "recipients": [
+#         {"account_id": "acc_123", "amount": 20.0},
+#         {"account_id": "acc_456", "amount": 30.0},
+#     ],
 # }
 ```
