@@ -1,7 +1,0 @@
-name: CI
-on: [pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "CI check failed intentionally for 24b-D test" && exit 1
