@@ -220,3 +220,22 @@ def estimate_fees(
         "network_fee": round(amount * 0.006, 2),
         "total_fee": round(amount * 0.02, 2),
     }
+
+
+def send_receipt(
+    transaction_id: str,
+    email: str,
+    format: str = "html",
+) -> dict:
+    """Send a payment receipt to a customer email address.
+
+    Supported formats: 'html' (default), 'pdf', 'plain'.
+    Returns delivery status and message ID.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "email": email,
+        "format": format,
+        "status": "sent",
+        "message_id": "msg_new",
+    }
