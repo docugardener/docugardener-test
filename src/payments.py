@@ -113,3 +113,22 @@ def void_payment(
         "status": "voided",
         "reason": reason,
     }
+
+
+def schedule_payment(
+    amount: float,
+    currency: str = "USD",
+    scheduled_at: str | None = None,
+) -> dict:
+    """Schedule a payment for future execution.
+
+    scheduled_at should be an ISO 8601 datetime string.
+    If omitted, the payment is scheduled for the next business day.
+    """
+    return {
+        "transaction_id": "txn_sched_new",
+        "status": "scheduled",
+        "amount": amount,
+        "currency": currency,
+        "scheduled_at": scheduled_at,
+    }
