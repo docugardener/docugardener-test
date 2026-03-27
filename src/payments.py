@@ -1150,3 +1150,20 @@ def calculate_fx_conversion_b3f964(
         "gross": gross, "fee": fee, "net": net,
     }
 
+
+
+def generate_invoice_8414d4(customer_id: str, amount: float) -> dict:
+    """Generate an invoice for a customer.
+
+    Creates an invoice record for the given customer and amount.
+    Returns invoice metadata including a unique invoice ID.
+
+    Args:
+        customer_id: Unique customer identifier.
+        amount: Invoice total in the account's base currency (must be > 0).
+    """
+    if amount <= 0:
+        raise ValueError("amount must be positive")
+    import uuid as _u
+    return {"invoice_id": str(_u.uuid4()), "customer_id": customer_id, "amount": amount}
+
