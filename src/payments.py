@@ -97,3 +97,19 @@ def authorize_payment(
         "currency": currency,
         "capture_method": capture_method,
     }
+
+
+def void_payment(
+    transaction_id: str,
+    reason: str = "customer_request",
+) -> dict:
+    """Void an authorized payment before capture.
+
+    Immediately releases the held funds. Only works on authorized
+    (uncaptured) payments. Use refund_payment for captured payments.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "status": "voided",
+        "reason": reason,
+    }

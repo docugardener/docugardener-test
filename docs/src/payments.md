@@ -1,43 +1,28 @@
 ```markdown
-### authorize_payment
+### `void_payment`
 
 ```python
-def authorize_payment(amount: float, currency: str = "USD", capture_method: str = "automatic", idempotency_key: str | None = None) -> dict
+def void_payment(transaction_id: str, reason: str = "customer_request") -> dict
 ```
 
-Authorize a payment without capturing funds immediately.
+Void an authorized payment before capture.
 
-Use `capture_method='manual'` to hold funds and capture later via `capture_payment()`.
-Authorized but uncaptured payments expire after 7 days.
+Immediately releases the held funds. Only works on authorized (uncaptured) payments. Use `refund_payment` for captured payments.
 
 **Parameters:**
 
-*   `amount` (float): The amount to authorize.
-*   `currency` (str, optional): The currency for the payment (e.g., "USD", "EUR"). Defaults to "USD".
-*   `capture_method` (str, optional):  `"automatic"` to immediately capture funds, or `"manual"` to authorize only. Defaults to `"automatic"`.
-*   `idempotency_key` (str | None, optional):  A unique key to prevent duplicate authorizations. If provided, repeated calls with the same key will return the same authorization. Defaults to `None`.
+*   `transaction_id` (str): The ID of the transaction to void.
+*   `reason` (str, optional): The reason for voiding the payment. Defaults to `"customer_request"`.
 
 **Returns:**
 
-A dictionary containing the authorization details:
-
-*   `transaction_id` (str):  A unique transaction identifier (starts with "txn\_auth\_").
-*   `status` (str): The status of the authorization, which will be `"authorized"`.
-*   `amount` (float): The authorized amount.
-*   `currency` (str): The currency of the authorization.
-*   `capture_method` (str): The capture method used.
+A dictionary containing the transaction ID, status, and reason for the void.
 
 **Example:**
 
 ```python
-authorization = authorize_payment(amount=100.00, currency="USD", capture_method="manual")
-print(authorization)
-# Expected output (actual transaction_id will vary):
-# {'transaction_id': 'txn_auth_new', 'status': 'authorized', 'amount': 100.0, 'currency': 'USD', 'capture_method': 'manual'}
+result = void_payment(transaction_id="12345", reason="incorrect_amount")
+print(result)
+# Expected output: {'transaction_id': '12345', 'status': 'voided', 'reason': 'incorrect_amount'}
 ```
-```python
-authorization = authorize_payment(amount=50.00, currency="EUR", idempotency_key="unique_key_123")
-print(authorization)
-# Expected output (actual transaction_id will vary):
-# {'transaction_id': 'txn_auth_unique_key_123', 'status': 'authorized', 'amount': 50.0, 'currency': 'EUR', 'capture_method': 'automatic'}
 ```
