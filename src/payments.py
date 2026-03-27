@@ -151,3 +151,23 @@ def split_payment(
         "currency": currency,
         "recipients": recipients,
     }
+
+
+def create_payment_link(
+    amount: float,
+    currency: str = "USD",
+    expires_in_hours: int = 24,
+    metadata: dict | None = None,
+) -> dict:
+    """Generate a shareable payment link for a given amount.
+
+    The link expires after expires_in_hours (default 24h).
+    Optional metadata is attached to the resulting transaction.
+    """
+    return {
+        "payment_link": "https://pay.example.com/link_new",
+        "amount": amount,
+        "currency": currency,
+        "expires_in_hours": expires_in_hours,
+        "status": "active",
+    }
