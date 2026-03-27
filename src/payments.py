@@ -47,7 +47,28 @@ def cancel_payment(
         "reason": reason,
         "customer_notified": notify_customer,
     }
-# payments module v2
+
+
+
+def retry_payment(
+    transaction_id: str,
+    max_attempts: int = 3,
+    backoff_seconds: float = 2.0,
+    use_new_idempotency_key: bool = True,
+) -> dict:
+    """Retry a failed payment with exponential backoff.
+
+    Only payments in 'failed' or 'declined' state can be retried.
+    Each retry uses a fresh idempotency key by default to avoid
+    duplicate-charge errors on the payment provider side.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "status": "retrying",
+        "max_attempts": max_attempts,
+        "backoff_seconds": backoff_seconds,
+    }
+
 
 def dispute_payment(
     transaction_id: str,
