@@ -625,3 +625,34 @@ def tokenize_card_48572b(
         "network": "unknown",   # resolved at authorisation time
     }
 
+
+
+def calculate_fx_conversion_b28394(
+    from_currency: str,
+    to_currency: str,
+    amount: float,
+    rate: float,
+) -> dict:
+    """Calculate the result of a foreign-exchange conversion for a payment.
+
+    Applies the provided exchange rate to the source amount, deducts a
+    0.5% conversion fee, and returns a full settlement breakdown including
+    gross converted amount, fee, and net amount.
+
+    Args:
+        from_currency: ISO 4217 source currency (e.g. "GBP").
+        to_currency:   ISO 4217 target currency (e.g. "USD").
+        amount:        Amount in source currency (must be > 0).
+        rate:          Exchange rate from_currency → to_currency (must be > 0).
+    """
+    if amount <= 0 or rate <= 0:
+        raise ValueError("amount and rate must be positive")
+    gross    = round(amount * rate, 2)
+    fee      = round(gross * 0.005, 2)
+    net      = round(gross - fee, 2)
+    return {
+        "from": from_currency, "to": to_currency,
+        "original": amount, "rate": rate,
+        "gross": gross, "fee": fee, "net": net,
+    }
+
