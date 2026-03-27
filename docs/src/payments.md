@@ -1,48 +1,53 @@
 ```markdown
-### `tokenize_card_d18a9b`
+### `calculate_fx_conversion_194903`
 
 ```python
-def tokenize_card_d18a9b(
-    card_number: str,
-    expiry_month: int,
-    expiry_year: int,
-    billing_zip: str,
-) -> dict:
+calculate_fx_conversion_194903(
+    from_currency: str,
+    to_currency: str,
+    amount: float,
+    rate: float,
+) -> dict
 ```
 
-Tokenize a card for PCI-compliant secure storage.
+Calculate the result of a foreign-exchange conversion for a payment.
 
-Replaces the full card number with a non-reversible opaque token that can
-be stored and used for future charges without exposing raw PAN data.
-The token encodes the last-4 digits for display purposes only.
+Applies the provided exchange rate to the source amount, deducts a
+0.5% conversion fee, and returns a full settlement breakdown including
+gross converted amount, fee, and net amount.
 
 **Parameters:**
 
-*   `card_number` (str): Full card number (PAN). Never stored after tokenisation.
-*   `expiry_month` (int): Card expiry month (1–12).
-*   `expiry_year` (int): Card expiry year (4-digit).
-*   `billing_zip` (str): Cardholder billing postal code for AVS checks.
+*   `from_currency` (*str*): ISO 4217 source currency (e.g. "GBP").
+*   `to_currency` (*str*): ISO 4217 target currency (e.g. "USD").
+*   `amount` (*float*): Amount in source currency (must be > 0).
+*   `rate` (*float*): Exchange rate `from_currency` → `to_currency` (must be > 0).
 
 **Returns:**
 
-A dictionary containing the tokenized card details.
+*   `dict`: A dictionary containing the conversion details, including the original amount, exchange rate, gross converted amount, conversion fee, and net converted amount. The dictionary has the following keys:
+    *   `"from"`: Source currency.
+    *   `"to"`: Target currency.
+    *   `"original"`: Original amount.
+    *   `"rate"`: Exchange rate.
+    *   `"gross"`: Gross converted amount.
+    *   `"fee"`: Conversion fee.
+    *   `"net"`: Net converted amount.
+
+**Raises:**
+
+*   `ValueError`: if amount or rate is not positive.
 
 **Example:**
 
 ```python
-result = tokenize_card_d18a9b(
-    card_number="4111111111111111",
-    expiry_month=12,
-    expiry_year=2025,
-    billing_zip="90210",
+result = calculate_fx_conversion_194903(
+    from_currency="GBP", to_currency="USD", amount=100.0, rate=1.25
 )
 print(result)
-# Expected output (token value will vary):
+# Expected output:
 # {
-#     'token': 'tok_1111_abcdef',
-#     'last4': '1111',
-#     'expiry': '12/2025',
-#     'billing_zip': '90210',
-#     'network': 'unknown'
+#   'from': 'GBP', 'to': 'USD', 'original': 100.0, 'rate': 1.25,
+#   'gross': 125.0, 'fee': 0.62, 'net': 124.38
 # }
 ```
