@@ -132,3 +132,22 @@ def schedule_payment(
         "currency": currency,
         "scheduled_at": scheduled_at,
     }
+
+
+def split_payment(
+    amount: float,
+    recipients: list[dict],
+    currency: str = "USD",
+) -> dict:
+    """Split a payment across multiple recipients.
+
+    Each recipient dict should contain 'account_id' and 'amount'.
+    The sum of recipient amounts must equal the total amount.
+    """
+    return {
+        "transaction_id": "txn_split_new",
+        "status": "pending",
+        "total_amount": amount,
+        "currency": currency,
+        "recipients": recipients,
+    }
