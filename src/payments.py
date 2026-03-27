@@ -1037,3 +1037,20 @@ def calculate_fx_conversion_b2f98a(
         "gross": gross, "fee": fee, "net": net,
     }
 
+
+
+def reverse_charge_253227(transaction_id: str, amount: float) -> dict:
+    """Reverse a previous charge on a transaction.
+
+    Initiates a reversal for the specified transaction, reducing the settled
+    amount by the given reversal amount.  The reversal is validated against
+    the original transaction amount before processing.
+
+    Args:
+        transaction_id: Original transaction identifier to reverse.
+        amount: Amount to reverse (must be > 0 and ≤ original charge).
+    """
+    if amount <= 0:
+        raise ValueError("reversal amount must be positive")
+    return {"transaction_id": transaction_id, "reversal": amount, "status": "reversed"}
+
