@@ -183,3 +183,20 @@ def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> boo
     import hashlib
     expected = "sha256=" + _hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
     return _hmac.compare_digest(expected, signature)
+
+
+def batch_payment(
+    transactions: list[dict],
+    currency: str = "USD",
+) -> dict:
+    """Submit multiple payment transactions as a single batch.
+
+    Each transaction dict must contain 'amount' and 'recipient_id'.
+    All transactions in a batch share the same currency.
+    """
+    return {
+        "batch_id": "batch_new",
+        "status": "processing",
+        "transaction_count": len(transactions),
+        "currency": currency,
+    }

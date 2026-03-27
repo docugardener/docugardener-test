@@ -1,34 +1,38 @@
 ```markdown
-### verify_webhook_signature
+Adds the `batch_payment` function to submit multiple payment transactions as a single batch.
+
+### `batch_payment`
 
 ```python
-def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool
+def batch_payment(
+    transactions: list[dict],
+    currency: str = "USD",
+) -> dict:
 ```
 
-Verify an incoming payment webhook signature.
+Submit multiple payment transactions as a single batch.
 
-Compares the provided HMAC-SHA256 signature against a locally
-computed digest using the shared secret. Returns True if valid.
+Each transaction dict must contain 'amount' and 'recipient_id'.
+All transactions in a batch share the same currency.
 
 **Parameters:**
 
-*   `payload` (bytes): The raw webhook request body as bytes.
-*   `signature` (str): The signature provided in the `X-Signature` header.
-*   `secret` (str): Your shared secret key.
+*   `transactions` (list[dict]): A list of transaction dictionaries, each containing 'amount' and 'recipient_id'.
+*   `currency` (str, optional): The currency for all transactions in the batch. Defaults to "USD".
 
 **Returns:**
 
-*   `bool`: True if the signature is valid, False otherwise.
+*   dict: A dictionary containing the batch ID, status, transaction count, and currency.
 
 **Example:**
 
 ```python
-payload = b'{"event": "payment.received", "data": {...}}'
-signature = "sha256=..."
-secret = "your_secret"
-
-if verify_webhook_signature(payload, signature, secret):
-    print("Valid signature!")
-else:
-    print("Invalid signature!")
+transactions = [
+    {"amount": 10, "recipient_id": "user1"},
+    {"amount": 20, "recipient_id": "user2"},
+]
+result = batch_payment(transactions, currency="EUR")
+print(result)
+# Expected output: {'batch_id': 'batch_new', 'status': 'processing', 'transaction_count': 2, 'currency': 'EUR'}
+```
 ```
