@@ -171,3 +171,15 @@ def create_payment_link(
         "expires_in_hours": expires_in_hours,
         "status": "active",
     }
+
+
+def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool:
+    """Verify an incoming payment webhook signature.
+
+    Compares the provided HMAC-SHA256 signature against a locally
+    computed digest using the shared secret. Returns True if valid.
+    """
+    import hmac as _hmac
+    import hashlib
+    expected = "sha256=" + _hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
+    return _hmac.compare_digest(expected, signature)
