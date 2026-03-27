@@ -1,53 +1,48 @@
 ```markdown
-### `calculate_fx_conversion_194903`
+### `validate_card_payment_a9eaaa`
 
 ```python
-calculate_fx_conversion_194903(
-    from_currency: str,
-    to_currency: str,
-    amount: float,
-    rate: float,
-) -> dict
+validate_card_payment_a9eaaa(method: str, card_last4: str, amount: float) -> dict:
 ```
 
-Calculate the result of a foreign-exchange conversion for a payment.
+Authorise a card-based payment after validating the payment method.
 
-Applies the provided exchange rate to the source amount, deducts a
-0.5% conversion fee, and returns a full settlement breakdown including
-gross converted amount, fee, and net amount.
+Checks that the supplied method is in the supported list and returns a full authorisation record
+including masked card details and the authorised amount.
+
+Raises `ValueError` for amounts less than or equal to 0. Returns a dictionary with `authorised: False` and an error message if the payment method is not supported.
 
 **Parameters:**
 
-*   `from_currency` (*str*): ISO 4217 source currency (e.g. "GBP").
-*   `to_currency` (*str*): ISO 4217 target currency (e.g. "USD").
-*   `amount` (*float*): Amount in source currency (must be > 0).
-*   `rate` (*float*): Exchange rate `from_currency` → `to_currency` (must be > 0).
+*   `method` (str): The payment method (e.g., "visa", "mastercard").
+*   `card_last4` (str): The last four digits of the card number.
+*   `amount` (float): The payment amount.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the conversion details, including the original amount, exchange rate, gross converted amount, conversion fee, and net converted amount. The dictionary has the following keys:
-    *   `"from"`: Source currency.
-    *   `"to"`: Target currency.
-    *   `"original"`: Original amount.
-    *   `"rate"`: Exchange rate.
-    *   `"gross"`: Gross converted amount.
-    *   `"fee"`: Conversion fee.
-    *   `"net"`: Net converted amount.
+A dictionary containing the authorisation details. If the payment is authorised, the dictionary will contain `authorised: True`, the payment `method`, the `card_last4`, a masked card number, the `amount`, and the `currency`. If the payment is not authorised (due to an unsupported method), the dictionary will contain `authorised: False`, an `error` message, and the attempted `method`.
 
 **Raises:**
 
-*   `ValueError`: if amount or rate is not positive.
+*   `ValueError`: if `amount` is less than or equal to 0.
 
-**Example:**
+**Examples:**
 
 ```python
-result = calculate_fx_conversion_194903(
-    from_currency="GBP", to_currency="USD", amount=100.0, rate=1.25
-)
+# Successful authorisation
+result = validate_card_payment_a9eaaa(method="visa", card_last4="1234", amount=100.0)
 print(result)
-# Expected output:
-# {
-#   'from': 'GBP', 'to': 'USD', 'original': 100.0, 'rate': 1.25,
-#   'gross': 125.0, 'fee': 0.62, 'net': 124.38
-# }
+# Expected output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
+
+# Unsuccessful authorisation due to unsupported method
+result = validate_card_payment_a9eaaa(method="unsupported", card_last4="1234", amount=100.0)
+print(result)
+# Expected output: {'authorised': False, 'error': 'unsupported_method', 'method': 'unsupported'}
+
+# Unsuccessful authorisation due to non-positive amount
+try:
+    result = validate_card_payment_a9eaaa(method="visa", card_last4="1234", amount=-100.0)
+except ValueError as e:
+    print(e)
+# Expected output: amount must be positive, got -100.0
 ```
