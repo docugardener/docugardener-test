@@ -276,3 +276,19 @@ def tokenize_card(
         "expiry": expiry,
         "status": "active",
     }
+
+
+def retry_failed_batch(
+    batch_id: str,
+    failed_only: bool = True,
+) -> dict:
+    """Retry all failed transactions within a previously submitted batch.
+
+    If failed_only is True (default), only failed transactions are retried.
+    If False, all transactions in the batch are resubmitted.
+    """
+    return {
+        "batch_id": batch_id,
+        "status": "retrying",
+        "failed_only": failed_only,
+    }
