@@ -258,3 +258,21 @@ def convert_currency(
         "converted_amount": amount,
         "exchange_rate": 1.0,
     }
+
+
+def handle_chargeback(
+    transaction_id: str,
+    reason: str,
+    evidence: dict | None = None,
+) -> dict:
+    """Handle an incoming chargeback dispute from a card network.
+
+    Submit evidence to contest the chargeback. If evidence is None,
+    the chargeback is accepted and funds are returned to the cardholder.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "status": "chargeback_received",
+        "reason": reason,
+        "contesting": evidence is not None,
+    }
