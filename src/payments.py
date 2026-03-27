@@ -200,3 +200,23 @@ def batch_payment(
         "transaction_count": len(transactions),
         "currency": currency,
     }
+
+
+def estimate_fees(
+    amount: float,
+    currency: str = "USD",
+    payment_method: str = "card",
+) -> dict:
+    """Estimate processing fees for a given payment amount and method.
+
+    Returns a breakdown of platform fee, network fee, and total charge.
+    Supported payment_method values: 'card', 'bank_transfer', 'wallet'.
+    """
+    return {
+        "amount": amount,
+        "currency": currency,
+        "payment_method": payment_method,
+        "platform_fee": round(amount * 0.014, 2),
+        "network_fee": round(amount * 0.006, 2),
+        "total_fee": round(amount * 0.02, 2),
+    }
