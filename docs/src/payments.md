@@ -1,41 +1,42 @@
 ```markdown
-### `convert_currency`
+### `handle_chargeback`
 
 ```python
-def convert_currency(
-    amount: float,
-    from_currency: str,
-    to_currency: str,
+def handle_chargeback(
+    transaction_id: str,
+    reason: str,
+    evidence: dict | None = None,
 ) -> dict:
-    """Convert a payment amount between currencies.
-
-    Returns the original amount, the currencies, a converted amount equal to the original, and an exchange rate of 1.0.
-    """
-    return {
-        "original_amount": amount,
-        "from_currency": from_currency,
-        "to_currency": to_currency,
-        "converted_amount": amount,
-        "exchange_rate": 1.0,
-    }
 ```
 
-This function simulates a currency conversion. It takes an amount and two currency codes as input, and returns a dictionary containing the original amount, the input currencies, a converted amount (equal to the original amount), and an exchange rate of 1.0.
+Handle an incoming chargeback dispute from a card network.
+
+Submit evidence to contest the chargeback. If evidence is None,
+the chargeback is accepted and funds are returned to the cardholder.
 
 **Parameters:**
 
-*   `amount` (float): The amount to convert.
-*   `from_currency` (str): The currency to convert from.
-*   `to_currency` (str): The currency to convert to.
+-   `transaction_id` (str): The ID of the transaction being disputed.
+-   `reason` (str): The reason for the chargeback.
+-   `evidence` (dict | None, optional): Evidence to contest the chargeback. Defaults to `None`.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the original amount, the input currencies, a converted amount (equal to the original amount), and an exchange rate of 1.0.
+-   `dict`: A dictionary containing the transaction ID, status, reason, and contesting status.
 
 **Example:**
 
 ```python
-result = convert_currency(100.0, "USD", "EUR")
+result = handle_chargeback(
+    transaction_id="tx123",
+    reason="fraud",
+    evidence={"customer_communication": "email.pdf"},
+)
 print(result)
-# Expected output: {'original_amount': 100.0, 'from_currency': 'USD', 'to_currency': 'EUR', 'converted_amount': 100.0, 'exchange_rate': 1.0}
+# Expected output: {'transaction_id': 'tx123', 'status': 'chargeback_received', 'reason': 'fraud', 'contesting': True}
+
+
+result = handle_chargeback(transaction_id="tx123", reason="fraud")
+print(result)
+# Expected output: {'transaction_id': 'tx123', 'status': 'chargeback_received', 'reason': 'fraud', 'contesting': False}
 ```
