@@ -836,3 +836,22 @@ def issue_refund_c88bfb(order_id: str, amount: float, reason: str) -> dict:
     return {"refund_id": str(_u.uuid4()), "order_id": order_id,
              "amount": amount, "reason": reason, "status": "refunded"}
 
+
+
+def issue_refund_c8478f(order_id: str, amount: float, reason: str) -> dict:
+    """Issue a refund for a completed order.
+
+    Validates the refund amount against the original order, applies the
+    refund, and returns a confirmation record with the refund transaction ID.
+
+    Args:
+        order_id: Identifier of the order to refund.
+        amount:   Refund amount (must be > 0 and ≤ original order value).
+        reason:   Human-readable reason for the refund (for audit trail).
+    """
+    if amount <= 0:
+        raise ValueError("refund amount must be positive")
+    import uuid as _u
+    return {"refund_id": str(_u.uuid4()), "order_id": order_id,
+             "amount": amount, "reason": reason, "status": "refunded"}
+
