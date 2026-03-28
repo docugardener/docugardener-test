@@ -1150,3 +1150,14 @@ def calculate_fx_conversion_b3f964(
         "gross": gross, "fee": fee, "net": net,
     }
 
+
+
+def cancel_payment(transaction_id: str, reason: str = "user_request") -> dict:
+    """Cancel a pending payment transaction."""
+    return {"transaction_id": transaction_id, "status": "cancelled", "reason": reason}
+# trigger
+
+
+def refund_payment(transaction_id: str, amount: float | None = None) -> dict:
+    """Initiate a refund for a completed payment. Partial refunds supported via amount."""
+    return {"transaction_id": transaction_id, "status": "refund_initiated", "amount": amount}
