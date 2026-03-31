@@ -1,48 +1,60 @@
 ```markdown
-### `tokenize_card_37a66e`
+### `calculate_fx_conversion_003c9b`
 
-Generates a non-reversible opaque token for a given card number and its details. The token includes the last four digits of the card for identification purposes.
+Calculates the result of a foreign-exchange conversion for a payment, applying a conversion fee.
+
+This function takes a source amount and an exchange rate, calculates the gross converted amount, deducts a 0.5% conversion fee, and returns a detailed breakdown including the gross amount, fee, and net amount.
 
 ```python
-def tokenize_card_37a66e(
-    card_number: str,
-    expiry_month: int,
-    expiry_year: int,
-    billing_zip: str,
+def calculate_fx_conversion_003c9b(
+    from_currency: str,
+    to_currency: str,
+    amount: float,
+    rate: float,
 ) -> dict:
 ```
 
 #### Parameters
 
-*   `card_number` (`str`): Full card number (PAN).
-*   `expiry_month` (`int`): Card expiry month (1–12).
-*   `expiry_year` (`int`): Card expiry year (4-digit).
-*   `billing_zip` (`str`): Cardholder billing postal code.
+*   `from_currency` (`str`): The ISO 4217 code for the source currency (e.g., "GBP").
+*   `to_currency` (`str`): The ISO 4217 code for the target currency (e.g., "USD").
+*   `amount` (`float`): The amount in the source currency. Must be a positive value.
+*   `rate` (`float`): The exchange rate from `from_currency` to `to_currency`. Must be a positive value.
 
 #### Returns
 
-`dict`: A dictionary containing the tokenized card details.
-*   `token` (`str`): The generated opaque token, prefixed with "tok_" and including the last four digits of the card.
-*   `last4` (`str`): The last four digits of the card number.
-*   `expiry` (`str`): The card expiry date formatted as "MM/YYYY".
-*   `billing_zip` (`str`): The provided cardholder billing postal code.
-*   `network` (`str`): Always "unknown".
+`dict`: A dictionary containing the conversion breakdown:
+*   `"from"` (`str`): The source currency code.
+*   `"to"` (`str`): The target currency code.
+*   `"original"` (`float`): The original amount in the source currency.
+*   `"rate"` (`float`): The applied exchange rate.
+*   `"gross"` (`float`): The amount after conversion but before fees, rounded to 2 decimal places.
+*   `"fee"` (`float`): The calculated 0.5% conversion fee, rounded to 2 decimal places.
+*   `"net"` (`float`): The final amount after deducting the fee, rounded to 2 decimal places.
+
+#### Raises
+
+*   `ValueError`: If `amount` or `rate` is not positive.
 
 #### Example
 
 ```python
-token_data = tokenize_card_37a66e(
-    card_number="4111222233334444",
-    expiry_month=12,
-    expiry_year=2025,
-    billing_zip="90210"
+conversion_details = calculate_fx_conversion_003c9b(
+    from_currency="GBP",
+    to_currency="USD",
+    amount=100.00,
+    rate=1.25
 )
-# Example output:
+print(conversion_details)
+# Expected output:
 # {
-#     'token': 'tok_4444_000000', # Hash part will vary
-#     'last4': '4444',
-#     'expiry': '12/2025',
-#     'billing_zip': '90210',
-#     'network': 'unknown'
+#     'from': 'GBP',
+#     'to': 'USD',
+#     'original': 100.0,
+#     'rate': 1.25,
+#     'gross': 125.0,
+#     'fee': 0.62,
+#     'net': 124.38
 # }
+```
 ```
