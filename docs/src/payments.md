@@ -1,54 +1,73 @@
-### `c9(method: str, card_last4: str, amount: float) -> dict`
+```markdown
+### `apply_surcharge_338fd4`
 
-**Description:**
-Authorises a card-based payment after validating the payment method. The function checks if the provided payment method is among the supported types and if the payment amount is positive. If these conditions are met, it returns a successful authorisation record. Otherwise, it indicates an error, either by returning an error object for unsupported methods or raising an exception for invalid amounts.
-
-**Parameters:**
-*   `method` (`str`): The payment method to be used (e.g., "visa", "mastercard", "amex", "discover", "unionpay"). Case-insensitive.
-*   `card_last4` (`str`): The last four digits of the card associated with the payment.
-*   `amount` (`float`): The payment amount. Must be a positive value.
-
-**Returns:**
-*   `dict`: A dictionary containing the authorisation result.
-    *   If the payment is successfully authorised:
-        ```json
-        {
-            "authorised": true,
-            "method": "visa",
-            "card_last4": "1234",
-            "masked": "****1234",
-            "amount": 100.00,
-            "currency": "USD"
-        }
-        ```
-    *   If the `method` is not supported:
-        ```json
-        {
-            "authorised": false,
-            "error": "unsupported_method",
-            "method": "jcb"
-        }
-        ```
-
-**Raises:**
-*   `ValueError`: If `amount` is less than or equal to 0.
-
-**Example:**
 ```python
-# Successful authorisation
-result = c9("visa", "1234", 100.00)
-print(result)
-# Expected: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
+def apply_surcharge_338fd4(amount: float, surcharge_pct: float, currency: str = "USD") -> dict:
+```
 
-# Unsupported payment method
-result = c9("jcb", "5678", 50.00)
-print(result)
-# Expected: {'authorised': False, 'error': 'unsupported_method', 'method': 'jcb'}
+Apply a percentage-based surcharge to a payment transaction.
 
-# Invalid amount
+Calculates the surcharge value, validates inputs, and returns a breakdown including the original amount, surcharge, total charged, and applied currency. Surcharge percentage must be between 0 and 50 (exclusive).
+
+#### Parameters
+
+*   **`amount`** (`float`):
+    Base transaction amount. Must be greater than 0.
+*   **`surcharge_pct`** (`float`):
+    Surcharge rate as a percentage (e.g., `2.5` for 2.5%). Must be between 0 and 50 (exclusive).
+*   **`currency`** (`str`, *optional*):
+    ISO 4217 currency code. Defaults to `"USD"`.
+
+#### Returns
+
+*   **`dict`**:
+    A dictionary containing the transaction breakdown:
+    *   `"original"` (`float`): The base transaction amount.
+    *   `"surcharge"` (`float`): The calculated surcharge amount, rounded to two decimal places.
+    *   `"total"` (`float`): The total amount charged (original + surcharge), rounded to two decimal places.
+    *   `"currency"` (`str`): The currency code applied.
+    *   `"rate_applied"` (`float`): The surcharge percentage rate that was applied.
+
+#### Raises
+
+*   **`ValueError`**:
+    *   If `amount` is not positive.
+    *   If `surcharge_pct` is not between 0 and 50 (exclusive).
+
+#### Example
+
+```python
+# Apply a 2.5% surcharge to $100
+result_usd = apply_surcharge_338fd4(amount=100.00, surcharge_pct=2.5)
+# result_usd will be:
+# {
+#     "original": 100.0,
+#     "surcharge": 2.5,
+#     "total": 102.5,
+#     "currency": "USD",
+#     "rate_applied": 2.5
+# }
+
+# Apply a 5% surcharge in EUR
+result_eur = apply_surcharge_338fd4(amount=50.00, surcharge_pct=5.0, currency="EUR")
+# result_eur will be:
+# {
+#     "original": 50.0,
+#     "surcharge": 2.5,
+#     "total": 52.5,
+#     "currency": "EUR",
+#     "rate_applied": 5.0
+# }
+
+# Example of invalid input
 try:
-    c9("mastercard", "9012", 0.00)
+    apply_surcharge_338fd4(amount=0, surcharge_pct=10)
 except ValueError as e:
-    print(e)
-# Expected: amount must be positive, got 0.0
+    print(e) # Output: amount must be positive
+
+try:
+    apply_surcharge_338fd4(amount=100, surcharge_pct=55)
+except ValueError as e:
+    print(e) # Output: surcharge_pct must be between 0 and 50
+```
 ```
