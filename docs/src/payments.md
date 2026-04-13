@@ -1,60 +1,43 @@
 ```markdown
-### `calculate_fx_conversion_003c9b`
+### `apply_credit_be8e11(account_id: str, credit: float) -> dict`
 
-Calculates the result of a foreign-exchange conversion for a payment, applying a conversion fee.
+Applies a credit to a customer account.
 
-This function takes a source amount and an exchange rate, calculates the gross converted amount, deducts a 0.5% conversion fee, and returns a detailed breakdown including the gross amount, fee, and net amount.
-
-```python
-def calculate_fx_conversion_003c9b(
-    from_currency: str,
-    to_currency: str,
-    amount: float,
-    rate: float,
-) -> dict:
-```
+This function validates the credit amount and applies it to the specified account, returning a confirmation record.
 
 #### Parameters
 
-*   `from_currency` (`str`): The ISO 4217 code for the source currency (e.g., "GBP").
-*   `to_currency` (`str`): The ISO 4217 code for the target currency (e.g., "USD").
-*   `amount` (`float`): The amount in the source currency. Must be a positive value.
-*   `rate` (`float`): The exchange rate from `from_currency` to `to_currency`. Must be a positive value.
+*   **`account_id`** (`str`): The target account identifier.
+*   **`credit`** (`float`): The credit amount to apply. Must be a positive value.
 
 #### Returns
 
-`dict`: A dictionary containing the conversion breakdown:
-*   `"from"` (`str`): The source currency code.
-*   `"to"` (`str`): The target currency code.
-*   `"original"` (`float`): The original amount in the source currency.
-*   `"rate"` (`float`): The applied exchange rate.
-*   `"gross"` (`float`): The amount after conversion but before fees, rounded to 2 decimal places.
-*   `"fee"` (`float`): The calculated 0.5% conversion fee, rounded to 2 decimal places.
-*   `"net"` (`float`): The final amount after deducting the fee, rounded to 2 decimal places.
+*   `dict`: A dictionary containing the `account_id`, the `applied_credit` amount, and a `status` of "ok".
+    *   Example: `{"account_id": "user123", "applied_credit": 50.0, "status": "ok"}`
 
 #### Raises
 
-*   `ValueError`: If `amount` or `rate` is not positive.
+*   `ValueError`: If the `credit` amount is less than or equal to 0.
 
 #### Example
 
 ```python
-conversion_details = calculate_fx_conversion_003c9b(
-    from_currency="GBP",
-    to_currency="USD",
-    amount=100.00,
-    rate=1.25
-)
-print(conversion_details)
-# Expected output:
-# {
-#     'from': 'GBP',
-#     'to': 'USD',
-#     'original': 100.0,
-#     'rate': 1.25,
-#     'gross': 125.0,
-#     'fee': 0.62,
-#     'net': 124.38
-# }
+from src.payments import apply_credit_be8e11
+
+# Applying a valid credit
+try:
+    result = apply_credit_be8e11(account_id="user_123", credit=100.50)
+    print(result)
+    # Expected output: {'account_id': 'user_123', 'applied_credit': 100.5, 'status': 'ok'}
+except ValueError as e:
+    print(f"Error: {e}")
+
+# Attempting to apply an invalid credit
+try:
+    result = apply_credit_be8e11(account_id="user_456", credit=0.0)
+    print(result)
+except ValueError as e:
+    print(f"Error: {e}")
+    # Expected output: Error: credit must be positive
 ```
 ```
