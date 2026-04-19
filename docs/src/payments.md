@@ -1,46 +1,49 @@
-### `validate_card_payment_24003d` Function
+## New Function: `apply_surcharge_5bcabf`
+
+Applies a percentage-based surcharge to a payment transaction.
+
+This function calculates the surcharge amount based on a given percentage and adds it to the original transaction amount. It includes input validation to ensure the amount is positive and the surcharge percentage is within an acceptable range.
+
+### Parameters
+
+*   `amount` (float): The base transaction amount. Must be greater than 0.
+*   `surcharge_pct` (float): The surcharge rate as a percentage (e.g., 2.5 for 2.5%). Must be between 0 and 50 (exclusive).
+*   `currency` (str, optional): The ISO 4217 currency code for the transaction. Defaults to "USD".
+
+### Returns
+
+*   `dict`: A dictionary containing the surcharge breakdown:
+    *   `"original"` (float): The original transaction amount.
+    *   `"surcharge"` (float): The calculated surcharge amount, rounded to 2 decimal places.
+    *   `"total"` (float): The total amount after applying the surcharge, rounded to 2 decimal places.
+    *   `"currency"` (str): The currency code applied to the transaction.
+    *   `"rate_applied"` (float): The surcharge percentage that was applied.
+
+### Raises
+
+*   `ValueError`: If `amount` is not positive.
+*   `ValueError`: If `surcharge_pct` is not between 0 and 50.
+
+### Example
+
 ```python
-validate_card_payment_24003d(method: str, card_last4: str, amount: float) -> dict
-```
+surcharge_details = apply_surcharge_5bcabf(
+    amount=100.00,
+    surcharge_pct=3.5,
+    currency="EUR"
+)
+print(surcharge_details)
+# Expected Output: {'original': 100.0, 'surcharge': 3.5, 'total': 103.5, 'currency': 'EUR', 'rate_applied': 3.5}
 
-**Description:**
-
-Authorise a card-based payment after validating the payment method.
-
-Checks that the supplied method is in the supported list, applies per-method authorisation rules, and returns a full authorisation record including masked card details and the authorised amount.
-
-**Parameters:**
-
-*   `method` (str): The payment method (e.g., "visa", "mastercard").
-*   `card_last4` (str): The last four digits of the card number.
-*   `amount` (float): The payment amount.
-
-**Returns:**
-
-*   A dictionary containing authorisation details if the payment is successful. This includes `authorised` (True), `method`, `card_last4`, `masked` card number, `amount`, and `currency`.
-*   A dictionary with `authorised` set to `False`, an `error` key (e.g., "unsupported_method"), and the provided `method` if the payment method is not supported.
-
-**Raises:**
-
-*   `ValueError`: if the `amount` is less than or equal to 0.
-
-**Example:**
-
-```python
-# Successful payment
-auth_success = validate_card_payment_24003d(method="visa", card_last4="1234", amount=100.00)
-print(auth_success)
-# Expected output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
-
-# Unsupported payment method
-auth_unsupported = validate_card_payment_24003d(method="bitcoin", card_last4="5678", amount=50.00)
-print(auth_unsupported)
-# Expected output: {'authorised': False, 'error': 'unsupported_method', 'method': 'bitcoin'}
-
-# Invalid amount
 try:
-    validate_card_payment_24003d(method="mastercard", card_last4="5678", amount=0)
+    apply_surcharge_5bcabf(amount=-50.00, surcharge_pct=2.0)
 except ValueError as e:
     print(e)
-# Expected output: amount must be positive, got 0
+# Expected Output: amount must be positive
+
+try:
+    apply_surcharge_5bcabf(amount=100.00, surcharge_pct=60.0)
+except ValueError as e:
+    print(e)
+# Expected Output: surcharge_pct must be between 0 and 50
 ```
