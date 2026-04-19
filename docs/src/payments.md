@@ -1,42 +1,49 @@
-## Function: `calculate_fx_conversion_f49f12`
+```markdown
+### `validate_card_payment_c7b0b7` Function
+```python
+validate_card_payment_c7b0b7(method: str, card_last4: str, amount: float) -> dict
+```
 
-### Description
+**Description:**
 
-Calculates the result of a foreign-exchange conversion for a payment.
+Authorise a card-based payment after validating the payment method.
 
-Applies the provided exchange rate to the source amount, deducts a 0.5% conversion fee, and returns a full settlement breakdown including gross converted amount, fee, and net amount.
+Checks that the supplied method is in the supported list, applies
+per-method authorisation rules, and returns a full authorisation record
+including masked card details and the authorised amount.
 
-### Parameters
+**Parameters:**
 
-*   `from_currency` (`str`): ISO 4217 source currency (e.g. "GBP").
-*   `to_currency` (`str`): ISO 4217 target currency (e.g. "USD").
-*   `amount` (`float`): Amount in source currency (must be > 0).
-*   `rate` (`float`): Exchange rate from_currency → to_currency (must be > 0).
+*   `method` (str): The payment method (e.g., "visa", "mastercard").
+*   `card_last4` (str): The last four digits of the card number.
+*   `amount` (float): The payment amount.
 
-### Returns
+**Returns:**
 
-`dict`: A dictionary containing the conversion breakdown:
-*   `"from"` (`str`): The source currency code.
-*   `"to"` (`str`): The target currency code.
-*   `"original"` (`float`): The original amount in the source currency.
-*   `"rate"` (`float`): The applied exchange rate.
-*   `"gross"` (`float`): The amount after conversion but before fees, rounded to 2 decimal places.
-*   `"fee"` (`float`): The calculated 0.5% conversion fee, rounded to 2 decimal places.
-*   `"net"` (`float`): The final amount after deducting the fee, rounded to 2 decimal places.
+`dict` containing the authorisation status, method, masked card details, and amount. If the method is unsupported, returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
 
-### Raises
+**Raises:**
 
-*   `ValueError`: If `amount` or `rate` are not positive.
+*   `ValueError`: if the `amount` is less than or equal to 0.
 
-### Example
+**Example:**
 
 ```python
-conversion_details = calculate_fx_conversion_f49f12(
-    from_currency="GBP",
-    to_currency="USD",
-    amount=100.00,
-    rate=1.25
-)
-print(conversion_details)
-# Expected output: {'from': 'GBP', 'to': 'USD', 'original': 100.0, 'rate': 1.25, 'gross': 125.0, 'fee': 0.62, 'net': 124.38}
+# Successful authorisation
+auth_success = validate_card_payment_c7b0b7(method="visa", card_last4="1234", amount=50.00)
+print(auth_success)
+# Output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 50.0, 'currency': 'USD'}
+
+# Unsupported method
+auth_fail = validate_card_payment_c7b0b7(method="paypal", card_last4="5678", amount=75.00)
+print(auth_fail)
+# Output: {'authorised': False, 'error': 'unsupported_method', 'method': 'paypal'}
+
+# Invalid amount
+try:
+    validate_card_payment_c7b0b7(method="mastercard", card_last4="9012", amount=0)
+except ValueError as e:
+    print(e)
+# Output: amount must be positive, got 0
+```
 ```
