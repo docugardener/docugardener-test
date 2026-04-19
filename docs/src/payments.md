@@ -1,43 +1,42 @@
-```markdown
-### New Function: `tokenize_card_87458c`
+## Function: `calculate_fx_conversion_f49f12`
 
-A new function `tokenize_card_87458c` has been added to the `src/payments.py` file.
+### Description
 
-#### `tokenize_card_87458c`
+Calculates the result of a foreign-exchange conversion for a payment.
 
-```python
-def tokenize_card_87458c(
-    card_number: str,
-    expiry_month: int,
-    expiry_year: int,
-    billing_zip: str,
-) -> dict:
-```
+Applies the provided exchange rate to the source amount, deducts a 0.5% conversion fee, and returns a full settlement breakdown including gross converted amount, fee, and net amount.
 
-This function tokenizes a credit card for secure, PCI-compliant storage. It replaces the full card number with a non-reversible opaque token. The token includes the last four digits of the card number for display purposes.
+### Parameters
 
-**Args:**
+*   `from_currency` (`str`): ISO 4217 source currency (e.g. "GBP").
+*   `to_currency` (`str`): ISO 4217 target currency (e.g. "USD").
+*   `amount` (`float`): Amount in source currency (must be > 0).
+*   `rate` (`float`): Exchange rate from_currency → to_currency (must be > 0).
 
-*   `card_number` (str): The full card number (Primary Account Number - PAN). This value is not stored after tokenization.
-*   `expiry_month` (int): The card's expiry month, represented as an integer from 1 to 12.
-*   `expiry_year` (int): The card's expiry year, represented as a 4-digit integer.
-*   `billing_zip` (str): The cardholder's billing postal code, used for Address Verification System (AVS) checks.
+### Returns
 
-**Returns:**
+`dict`: A dictionary containing the conversion breakdown:
+*   `"from"` (`str`): The source currency code.
+*   `"to"` (`str`): The target currency code.
+*   `"original"` (`float`): The original amount in the source currency.
+*   `"rate"` (`float`): The applied exchange rate.
+*   `"gross"` (`float`): The amount after conversion but before fees, rounded to 2 decimal places.
+*   `"fee"` (`float`): The calculated 0.5% conversion fee, rounded to 2 decimal places.
+*   `"net"` (`float`): The final amount after deducting the fee, rounded to 2 decimal places.
 
-*   A dictionary containing the following keys:
-    *   `token` (str): The generated opaque token.
-    *   `last4` (str): The last four digits of the card number.
-    *   `expiry` (str): The expiry date in "MM/YYYY" format.
-    *   `billing_zip` (str): The provided billing zip code.
-    *   `network` (str): The card network, which is initially set to "unknown" and resolved during authorization.
+### Raises
 
-**Example:**
+*   `ValueError`: If `amount` or `rate` are not positive.
+
+### Example
 
 ```python
-token_data = tokenize_card_87458c("1234567890123456", 12, 2025, "90210")
-print(token_data)
-# Expected output (token will vary):
-# {'token': 'tok_3456_abcdef', 'last4': '3456', 'expiry': '12/2025', 'billing_zip': '90210', 'network': 'unknown'}
-```
+conversion_details = calculate_fx_conversion_f49f12(
+    from_currency="GBP",
+    to_currency="USD",
+    amount=100.00,
+    rate=1.25
+)
+print(conversion_details)
+# Expected output: {'from': 'GBP', 'to': 'USD', 'original': 100.0, 'rate': 1.25, 'gross': 125.0, 'fee': 0.62, 'net': 124.38}
 ```
