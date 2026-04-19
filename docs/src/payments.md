@@ -1,49 +1,37 @@
-```markdown
-### `validate_card_payment_c7b0b7` Function
+### `apply_surcharge_c23a79`
+Applies a percentage-based surcharge to a payment transaction.
+
+This function calculates the surcharge value based on a given percentage, validates the input parameters, and returns a detailed breakdown of the transaction. The surcharge percentage must be strictly between 0 and 50.
+
+Args:
+    amount (float): The base transaction amount. Must be a positive value.
+    surcharge_pct (float): The surcharge rate expressed as a percentage (e.g., 2.5 for 2.5%).
+    currency (str, optional): The ISO 4217 currency code for the transaction. Defaults to "USD".
+
+Returns:
+    dict: A dictionary containing the surcharge breakdown:
+        * `"original"` (float): The original transaction amount.
+        * `"surcharge"` (float): The calculated surcharge amount, rounded to 2 decimal places.
+        * `"total"` (float): The total amount including the surcharge, rounded to 2 decimal places.
+        * `"currency"` (str): The currency code applied to the transaction.
+        * `"rate_applied"` (float): The surcharge percentage that was applied.
+
+Raises:
+    ValueError: If `amount` is not positive, or if `surcharge_pct` is not between 0 and 50 (exclusive).
+
+Example:
 ```python
-validate_card_payment_c7b0b7(method: str, card_last4: str, amount: float) -> dict
-```
+surcharge_details = apply_surcharge_c23a79(
+    amount=100.00,
+    surcharge_pct=2.5,
+    currency="EUR"
+)
+print(surcharge_details)
+# Output: {'original': 100.0, 'surcharge': 2.5, 'total': 102.5, 'currency': 'EUR', 'rate_applied': 2.5}
 
-**Description:**
-
-Authorise a card-based payment after validating the payment method.
-
-Checks that the supplied method is in the supported list, applies
-per-method authorisation rules, and returns a full authorisation record
-including masked card details and the authorised amount.
-
-**Parameters:**
-
-*   `method` (str): The payment method (e.g., "visa", "mastercard").
-*   `card_last4` (str): The last four digits of the card number.
-*   `amount` (float): The payment amount.
-
-**Returns:**
-
-`dict` containing the authorisation status, method, masked card details, and amount. If the method is unsupported, returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
-
-**Raises:**
-
-*   `ValueError`: if the `amount` is less than or equal to 0.
-
-**Example:**
-
-```python
-# Successful authorisation
-auth_success = validate_card_payment_c7b0b7(method="visa", card_last4="1234", amount=50.00)
-print(auth_success)
-# Output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 50.0, 'currency': 'USD'}
-
-# Unsupported method
-auth_fail = validate_card_payment_c7b0b7(method="paypal", card_last4="5678", amount=75.00)
-print(auth_fail)
-# Output: {'authorised': False, 'error': 'unsupported_method', 'method': 'paypal'}
-
-# Invalid amount
 try:
-    validate_card_payment_c7b0b7(method="mastercard", card_last4="9012", amount=0)
+    apply_surcharge_c23a79(amount=50.0, surcharge_pct=60.0)
 except ValueError as e:
     print(e)
-# Output: amount must be positive, got 0
-```
+# Output: surcharge_pct must be between 0 and 50
 ```
