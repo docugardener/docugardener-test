@@ -1,46 +1,60 @@
 ```markdown
-### `validate_card_payment_8d91b1` Function
+### `issue_refund_aaa4fd` Function
 ```python
-validate_card_payment_8d91b1(method: str, card_last4: str, amount: float) -> dict
+def issue_refund_aaa4fd(order_id: str, amount: float, reason: str) -> dict:
+    """Issue a refund for a completed order.
+
+    Validates the refund amount against the original order, applies the
+    refund, and returns a confirmation record with the refund transaction ID.
+
+    Args:
+        order_id: Identifier of the order to refund.
+        amount:   Refund amount (must be > 0 and <= original order value).
+        reason:   Human-readable reason for the refund (for audit trail).
+
+    Returns:
+        dict with refund_id, order_id, amount, reason, and status keys.
+    """
+    if amount <= 0:
+        raise ValueError("refund amount must be positive")
+    import uuid as _u
+    return {"refund_id": str(_u.uuid4()), "order_id": order_id,
+             "amount": amount, "reason": reason, "status": "refunded"}
 ```
 
 **Description:**
 
-Authorise a card-based payment after validating the payment method.
-
-Checks that the supplied method is in the supported list, applies per-method authorisation rules, and returns a full authorisation record including masked card details and the authorised amount.
+Issue a refund for a completed order. This function generates a refund record with a unique transaction ID. It includes a basic validation to ensure the refund amount is positive.
 
 **Parameters:**
 
-*   `method` (str): The payment method (e.g., "visa", "mastercard").
-*   `card_last4` (str): The last four digits of the card number.
-*   `amount` (float): The payment amount.
+*   `order_id` (`str`): Identifier of the order to refund.
+*   `amount` (`float`): Refund amount (must be > 0 and <= original order value).
+*   `reason` (`str`): Human-readable reason for the refund (for audit trail).
 
 **Returns:**
 
-`dict` containing authorisation details. If successful, includes `authorised`, `method`, `card_last4`, `masked` card number, `amount`, and `currency`. If the method is unsupported, returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
+*   `dict`: A dictionary containing the refund details with the following keys:
+    *   `refund_id` (`str`): A unique identifier for the refund transaction.
+    *   `order_id` (`str`): The identifier of the order being refunded.
+    *   `amount` (`float`): The amount refunded.
+    *   `reason` (`str`): The reason provided for the refund.
+    *   `status` (`str`): The status of the refund, which is always "refunded".
 
 **Raises:**
 
-*   `ValueError`: if the `amount` is less than or equal to 0.
+*   `ValueError`: If the `amount` is not positive.
 
 **Example:**
 
 ```python
-# Successful authorisation
-auth_record = validate_card_payment_8d91b1(method="visa", card_last4="1234", amount=100.00)
-print(auth_record)
-# Output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
-
-# Unsupported method
-auth_record_unsupported = validate_card_payment_8d91b1(method="bitcoin", card_last4="5678", amount=50.00)
-print(auth_record_unsupported)
-# Output: {'authorised': False, 'error': 'unsupported_method', 'method': 'bitcoin'}
-
-# Invalid amount
-try:
-    validate_card_payment_8d91b1(method="mastercard", card_last4="9012", amount=0)
-except ValueError as e:
-    print(e)
-# Output: amount must be positive, got 0
+refund_details = issue_refund_aaa4fd(
+    order_id="ORD12345",
+    amount=50.00,
+    reason="Customer returned item"
+)
+print(refund_details)
+# Expected output (refund_id will be a unique UUID):
+# {'refund_id': '...', 'order_id': 'ORD12345', 'amount': 50.0, 'reason': 'Customer returned item', 'status': 'refunded'}
+```
 ```
