@@ -1,38 +1,34 @@
 ```markdown
-### `calculate_fx_conversion_572f33`
-Calculate the result of a foreign-exchange conversion for a payment.
+### New Function: `issue_refund_9ee8b6`
 
-Applies the provided exchange rate to the source amount, deducts a
-0.5% conversion fee, and returns a full settlement breakdown including
-gross converted amount, fee, and net amount.
+#### Description
+Issue a refund for a completed order. This function generates a refund record with a unique transaction ID. It includes a basic validation to ensure the refund amount is positive.
 
-**Parameters:**
+#### Parameters
+*   `order_id` (`str`): Identifier of the order to refund.
+*   `amount` (`float`): Refund amount (must be > 0).
+*   `reason` (`str`): Human-readable reason for the refund (for audit trail).
 
-*   `from_currency` (str): ISO 4217 source currency (e.g. "GBP").
-*   `to_currency` (str): ISO 4217 target currency (e.g. "USD").
-*   `amount` (float): Amount in source currency (must be > 0).
-*   `rate` (float): Exchange rate from_currency → to_currency (must be > 0).
+#### Returns
+*   `dict`: A dictionary containing the refund details with the following keys:
+    *   `refund_id` (`str`): A unique identifier for the refund transaction.
+    *   `order_id` (`str`): The identifier of the order being refunded.
+    *   `amount` (`float`): The amount refunded.
+    *   `reason` (`str`): The reason provided for the refund.
+    *   `status` (`str`): The status of the refund, which is always "refunded".
 
-**Returns:**
+#### Raises
+*   `ValueError`: If the `amount` is not positive.
 
-*   `dict`: A dictionary containing the FX conversion breakdown.
-    *   `from` (str): The source currency.
-    *   `to` (str): The target currency.
-    *   `original` (float): The original amount in the source currency.
-    *   `rate` (float): The exchange rate used.
-    *   `gross` (float): The converted amount before fees.
-    *   `fee` (float): The calculated 0.5% conversion fee.
-    *   `net` (float): The final amount after deducting the fee.
-
-**Example:**
-
+#### Example
 ```python
-from_currency = "GBP"
-to_currency = "USD"
-amount = 100.0
-rate = 1.25
-result = calculate_fx_conversion_572f33(from_currency, to_currency, amount, rate)
-print(result)
-# Expected output: {'from': 'GBP', 'to': 'USD', 'original': 100.0, 'rate': 1.25, 'gross': 125.0, 'fee': 0.62, 'net': 124.38}
+refund_details = issue_refund_9ee8b6(
+    order_id="ORD12345",
+    amount=50.00,
+    reason="Customer returned item"
+)
+print(refund_details)
+# Expected output (refund_id will be a unique UUID):
+# {'refund_id': '...', 'order_id': 'ORD12345', 'amount': 50.0, 'reason': 'Customer returned item', 'status': 'refunded'}
 ```
 ```
