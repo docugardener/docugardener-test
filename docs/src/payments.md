@@ -1,16 +1,9 @@
 ```markdown
-### `validate_card_payment_2eb004` Function
-```python
-validate_card_payment_2eb004(method: str, card_last4: str, amount: float) -> dict
-```
+### New Function: `validate_card_payment_acdc32`
 
-**Description:**
+This function authorises a card-based payment after validating the payment method.
 
-Authorise a card-based payment after validating the payment method.
-
-Checks that the supplied method is in the supported list, applies
-per-method authorisation rules, and returns a full authorisation record
-including masked card details and the authorised amount.
+It checks if the provided payment method is supported, applies per-method authorisation rules, and returns a full authorisation record.
 
 **Parameters:**
 
@@ -20,30 +13,24 @@ including masked card details and the authorised amount.
 
 **Returns:**
 
-`dict` with authorisation details. If authorised, includes `authorised`, `method`, `card_last4`, `masked` card number, `amount`, and `currency`. If the method is unsupported, returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
+A dictionary containing the authorisation status, method, masked card details, and amount. If the method is unsupported, it returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
 
 **Raises:**
 
-*   `ValueError`: if the `amount` is less than or equal to 0.
+*   `ValueError`: If the `amount` is less than or equal to 0.
 
 **Example:**
 
 ```python
-# Successful authorisation
-auth_record = validate_card_payment_2eb004(method="visa", card_last4="1234", amount=50.00)
-print(auth_record)
-# Output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 50.0, 'currency': 'USD'}
+>>> validate_card_payment_acdc32("visa", "1234", 100.0)
+{'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
 
-# Unsupported method
-auth_record_unsupported = validate_card_payment_2eb004(method="bitcoin", card_last4="5678", amount=100.00)
-print(auth_record_unsupported)
-# Output: {'authorised': False, 'error': 'unsupported_method', 'method': 'bitcoin'}
+>>> validate_card_payment_acdc32("paypal", "5678", 50.0)
+{'authorised': False, 'error': 'unsupported_method', 'method': 'paypal'}
 
-# Invalid amount
-try:
-    validate_card_payment_2eb004(method="mastercard", card_last4="4321", amount=0)
-except ValueError as e:
-    print(e)
-# Output: amount must be positive, got 0
+>>> validate_card_payment_acdc32("mastercard", "9012", 0)
+Traceback (most recent call last):
+  ...
+ValueError: amount must be positive, got 0
 ```
 ```
