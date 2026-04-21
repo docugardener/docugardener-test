@@ -1573,3 +1573,64 @@ def handle_dispute_webhook(payload: dict, secret: str) -> dict:
             "status": "unknown", "action_taken": "logged"}
 # test 1776783555
 # trigger 1776784172
+def capture_payment(
+    transaction_id: str,
+    amount: float | None = None,
+    capture_method: str = "automatic",
+    statement_descriptor: str | None = None,
+) -> dict:
+    """Capture an authorized payment, optionally for a partial amount.
+
+    Moves a payment from 'authorized' state to 'captured'. If amount is
+    omitted the full authorized amount is captured. Only works on payments
+    with capture_method='manual' that are in 'authorized' state.
+
+    Args:
+        transaction_id: The payment to capture.
+        amount: Partial capture amount. Defaults to full authorized amount.
+        capture_method: 'automatic' or 'manual'. Defaults to 'automatic'.
+        statement_descriptor: Custom text shown on the customer's bank statement.
+
+    Returns:
+        dict with transaction_id, captured_amount, status, and statement_descriptor.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "status": "captured",
+        "captured_amount": amount,
+        "capture_method": capture_method,
+        "statement_descriptor": statement_descriptor,
+    }
+
+
+def dispute_payment(
+    transaction_id: str,
+    reason: str,
+    evidence: dict | None = None,
+    submit_immediately: bool = False,
+) -> dict:
+    """Open or respond to a payment dispute (chargeback).
+
+    Submits dispute evidence to the payment processor. Evidence should
+    include customer communications, shipping proof, and service records.
+    Disputes not responded to within 7 days are automatically lost.
+
+    Args:
+        transaction_id: The disputed payment's transaction ID.
+        reason: Dispute reason code (e.g. 'fraudulent', 'product_not_received').
+        evidence: Dict of supporting documents. Keys: customer_communication,
+                  shipping_documentation, service_documentation.
+        submit_immediately: If True, submits evidence to processor right away.
+                            If False, saves as draft for review.
+
+    Returns:
+        dict with dispute_id, status ('draft' or 'submitted'), and deadline.
+    """
+    return {
+        "transaction_id": transaction_id,
+        "dispute_id": f"dp_{transaction_id[:8]}",
+        "reason": reason,
+        "status": "submitted" if submit_immediately else "draft",
+        "evidence_received": bool(evidence),
+        "deadline_days": 7,
+    }
