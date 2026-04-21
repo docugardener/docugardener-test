@@ -1,27 +1,46 @@
 ```markdown
-### `tokenize_card_cb932b`
-Tokenizes a card for PCI-compliant secure storage.
+### `validate_card_payment_8d91b1` Function
+```python
+validate_card_payment_8d91b1(method: str, card_last4: str, amount: float) -> dict
+```
 
-Replaces the full card number with a non-reversible opaque token that can
-be stored and used for future charges without exposing raw PAN data.
-The token encodes the last-4 digits for display purposes only.
+**Description:**
+
+Authorise a card-based payment after validating the payment method.
+
+Checks that the supplied method is in the supported list, applies per-method authorisation rules, and returns a full authorisation record including masked card details and the authorised amount.
 
 **Parameters:**
 
-*   `card_number` (str): Full card number (PAN). Never stored after tokenisation.
-*   `expiry_month` (int): Card expiry month (1–12).
-*   `expiry_year` (int): Card expiry year (4-digit).
-*   `billing_zip` (str): Cardholder billing postal code for AVS checks.
+*   `method` (str): The payment method (e.g., "visa", "mastercard").
+*   `card_last4` (str): The last four digits of the card number.
+*   `amount` (float): The payment amount.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the token, last 4 digits, expiry, billing zip, and network.
+`dict` containing authorisation details. If successful, includes `authorised`, `method`, `card_last4`, `masked` card number, `amount`, and `currency`. If the method is unsupported, returns `{"authorised": False, "error": "unsupported_method", "method": method}`.
+
+**Raises:**
+
+*   `ValueError`: if the `amount` is less than or equal to 0.
 
 **Example:**
 
 ```python
-token_data = tokenize_card_cb932b("1234567890123456", 12, 2025, "90210")
-print(token_data)
-# Expected output: {'token': 'tok_3456_xxxxxx', 'last4': '3456', 'expiry': '12/2025', 'billing_zip': '90210', 'network': 'unknown'}
-```
+# Successful authorisation
+auth_record = validate_card_payment_8d91b1(method="visa", card_last4="1234", amount=100.00)
+print(auth_record)
+# Output: {'authorised': True, 'method': 'visa', 'card_last4': '1234', 'masked': '****1234', 'amount': 100.0, 'currency': 'USD'}
+
+# Unsupported method
+auth_record_unsupported = validate_card_payment_8d91b1(method="bitcoin", card_last4="5678", amount=50.00)
+print(auth_record_unsupported)
+# Output: {'authorised': False, 'error': 'unsupported_method', 'method': 'bitcoin'}
+
+# Invalid amount
+try:
+    validate_card_payment_8d91b1(method="mastercard", card_last4="9012", amount=0)
+except ValueError as e:
+    print(e)
+# Output: amount must be positive, got 0
 ```
