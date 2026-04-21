@@ -1,42 +1,33 @@
 ```markdown
-### `apply_credit_e655d9` Function
-```python
-def apply_credit_e655d9(account_id: str, credit: float) -> dict:
-    """Apply a credit to a customer account.
+### `apply_surcharge_9719b7`
+Applies a percentage-based surcharge to a payment transaction.
 
-    Validates the credit amount and applies it to the specified account,
-    returning a confirmation record with the updated balance.
-
-    Args:
-        account_id: Target account identifier.
-        credit: Credit amount to apply (must be > 0).
-    """
-    if credit <= 0:
-        raise ValueError("credit must be positive")
-    return {"account_id": account_id, "applied_credit": credit, "status": "ok"}
-```
-
-**Description:**
-
-Apply a credit to a customer account. This function validates that the credit amount is positive and then returns a confirmation record indicating the account ID and the applied credit amount.
+Calculates the surcharge value, validates inputs, and returns a breakdown
+including the original amount, surcharge, total charged, and applied currency.
+Surcharge percentage must be between 0 and 50 (exclusive).
 
 **Parameters:**
 
-*   `account_id` (str): Target account identifier.
-*   `credit` (float): Credit amount to apply. Must be greater than 0.
+*   `amount` (float): Base transaction amount (must be > 0).
+*   `surcharge_pct` (float): Surcharge rate as a percentage (e.g. 2.5 for 2.5%).
+*   `currency` (str): ISO 4217 currency code. Defaults to "USD".
 
 **Returns:**
 
-*   `dict`: A dictionary containing `account_id`, `applied_credit`, and `status` keys. The status will be "ok" upon successful application.
+*   `dict`: A dictionary containing the original amount, surcharge amount, total amount charged, and the currency.
 
 **Raises:**
 
-*   `ValueError`: If the `credit` amount is not positive.
+*   `ValueError`: If `amount` is not positive.
+*   `ValueError`: If `surcharge_pct` is not between 0 and 50.
 
 **Example:**
 
 ```python
-credit_confirmation = apply_credit_e655d9(account_id="acc_12345", credit=50.00)
-print(credit_confirmation)
-# Expected output: {'account_id': 'acc_12345', 'applied_credit': 50.0, 'status': 'ok'}
+original_amount = 100.0
+surcharge_rate = 5.0
+result = apply_surcharge_9719b7(original_amount, surcharge_rate, "EUR")
+print(result)
+# Expected output: {'original': 100.0, 'surcharge': 5.0, 'total': 105.0, 'currency': 'EUR', 'rate_applied': 5.0}
+```
 ```
