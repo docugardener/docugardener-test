@@ -1,33 +1,27 @@
 ```markdown
-### `apply_surcharge_9719b7`
-Applies a percentage-based surcharge to a payment transaction.
+### `tokenize_card_cb932b`
+Tokenizes a card for PCI-compliant secure storage.
 
-Calculates the surcharge value, validates inputs, and returns a breakdown
-including the original amount, surcharge, total charged, and applied currency.
-Surcharge percentage must be between 0 and 50 (exclusive).
+Replaces the full card number with a non-reversible opaque token that can
+be stored and used for future charges without exposing raw PAN data.
+The token encodes the last-4 digits for display purposes only.
 
 **Parameters:**
 
-*   `amount` (float): Base transaction amount (must be > 0).
-*   `surcharge_pct` (float): Surcharge rate as a percentage (e.g. 2.5 for 2.5%).
-*   `currency` (str): ISO 4217 currency code. Defaults to "USD".
+*   `card_number` (str): Full card number (PAN). Never stored after tokenisation.
+*   `expiry_month` (int): Card expiry month (1–12).
+*   `expiry_year` (int): Card expiry year (4-digit).
+*   `billing_zip` (str): Cardholder billing postal code for AVS checks.
 
 **Returns:**
 
-*   `dict`: A dictionary containing the original amount, surcharge amount, total amount charged, and the currency.
-
-**Raises:**
-
-*   `ValueError`: If `amount` is not positive.
-*   `ValueError`: If `surcharge_pct` is not between 0 and 50.
+*   `dict`: A dictionary containing the token, last 4 digits, expiry, billing zip, and network.
 
 **Example:**
 
 ```python
-original_amount = 100.0
-surcharge_rate = 5.0
-result = apply_surcharge_9719b7(original_amount, surcharge_rate, "EUR")
-print(result)
-# Expected output: {'original': 100.0, 'surcharge': 5.0, 'total': 105.0, 'currency': 'EUR', 'rate_applied': 5.0}
+token_data = tokenize_card_cb932b("1234567890123456", 12, 2025, "90210")
+print(token_data)
+# Expected output: {'token': 'tok_3456_xxxxxx', 'last4': '3456', 'expiry': '12/2025', 'billing_zip': '90210', 'network': 'unknown'}
 ```
 ```
