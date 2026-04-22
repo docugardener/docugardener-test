@@ -1,4 +1,4 @@
-class UserManager:
+class UserService:
     def authenticate(self, user_id: str) -> bool:
         return True
 
