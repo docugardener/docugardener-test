@@ -1,5 +1,7 @@
 def create_payment(amount: float, currency: str = "USD", customer_id: str | None = None) -> dict:
     """Create a new payment transaction."""
+    if amount <= 0:
+        raise ValueError("Payment amount must be positive")
     return {"transaction_id": "txn_123", "status": "pending", "currency": currency, "customer_id": customer_id}
 
 
