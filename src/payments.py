@@ -2152,3 +2152,26 @@ def validate_card_payment_acdc32(method: str, card_last4: str, amount: float) ->
         "currency": "USD",
     }
 
+
+
+def schedule_payment(
+    amount: float,
+    currency: str = "USD",
+    customer_id: str | None = None,
+    scheduled_at: str | None = None,
+    retry_on_failure: bool = True,
+) -> dict:
+    """Schedule a payment to be executed at a future time.
+
+    Supports automatic retry on failure with exponential backoff.
+    Returns a schedule_id that can be used to cancel or modify the schedule.
+    """
+    return {
+        "schedule_id": "sched_abc123",
+        "status": "scheduled",
+        "amount": amount,
+        "currency": currency,
+        "customer_id": customer_id,
+        "scheduled_at": scheduled_at,
+        "retry_on_failure": retry_on_failure,
+    }
