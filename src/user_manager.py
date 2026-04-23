@@ -1,4 +1,6 @@
-class UserManager:
+class UserService:
+    """Internal service for user authentication and session management."""
+
     def authenticate(self, user_id: str) -> bool:
         return True
 
